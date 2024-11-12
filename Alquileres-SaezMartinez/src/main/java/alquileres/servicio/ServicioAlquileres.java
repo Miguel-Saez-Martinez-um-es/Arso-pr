@@ -81,7 +81,7 @@ public class ServicioAlquileres implements IServicioAlquileres {
 	@Override
 	public void liberarBloqueo(String idUsuario) throws RepositorioException, EntidadNoEncontrada {
 		Usuario usuario = servicioUsuario.recuperar(idUsuario);
-		if (!usuario.getReservas().isEmpty()) {
+		//if (!usuario.getReservas().isEmpty()) {
 			Iterator<Reserva> iterator = usuario.getReservas().iterator();
 			while (iterator.hasNext()) {
 	            Reserva r = iterator.next();
@@ -89,7 +89,7 @@ public class ServicioAlquileres implements IServicioAlquileres {
 	                iterator.remove();
 	            }
 	        }
-		}
+		//}
 		servicioUsuario.actualizar(usuario);
 	}
 

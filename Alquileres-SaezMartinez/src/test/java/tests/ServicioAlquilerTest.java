@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,6 +36,11 @@ public class ServicioAlquilerTest {
 		idBicicleta2 = "Bicicleta 2";
 		idEstacion = "Estacion 1";
 		usuario = new Usuario(idUsuario);
+		//servicioUsuario.borrar(idUsuario);
+	}
+	
+	@After
+	public void finalizar()  throws Exception {
 		servicioUsuario.borrar(idUsuario);
 	}
 
@@ -42,7 +48,7 @@ public class ServicioAlquilerTest {
 	public void testReservar() throws RepositorioException, EntidadNoEncontrada {
 
 		// No hay ninguna reservaActiva en este momento
-		assertTrue(usuario.getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
 
 		// Reservamos una bicicleta
 		servicio.reservar(idUsuario, idBicicleta);
@@ -56,7 +62,7 @@ public class ServicioAlquilerTest {
 	public void testReservarConReservaActiva() throws RepositorioException, EntidadNoEncontrada {
 
 		// No hay ninguna reservaActiva en este momento
-		assertTrue(usuario.getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
 
 		// Reservamos una bicicleta y tratamos de reservar otra bicicleta
 		servicio.reservar(idUsuario, idBicicleta);
@@ -70,8 +76,8 @@ public class ServicioAlquilerTest {
 	public void testReservarConAlquilerActivo() throws RepositorioException, EntidadNoEncontrada {
 
 		// No hay ninguna reservaActiva o alquilerActivo en este momento
-		assertTrue(usuario.getReservas().isEmpty());
-		assertTrue(usuario.getAlquileres().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().isEmpty());
 
 		// Alquilamos una bicicleta e intentamos reservar otra bicicleta
 		servicio.alquilar(idUsuario, idBicicleta);
@@ -91,7 +97,7 @@ public class ServicioAlquilerTest {
 		LocalDateTime caducidad = LocalDateTime.now().minusDays(1);
 
 		// No hay ninguna reserva en este momento
-		assertTrue(usuario.getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
 
 		// Creamos y añadimos 3 reservas ya caducadas al usuario
 		Reserva r1 = new Reserva(idBicicleta, creada, caducidad);
@@ -101,6 +107,10 @@ public class ServicioAlquilerTest {
 		usuario.addReserva(r1);
 		usuario.addReserva(r2);
 		usuario.addReserva(r3);
+
+		servicioUsuario.actualizar(usuario);
+		
+		assertTrue(servicioUsuario.recuperar(idUsuario).bloqueado());
 
 		// Tratamos de reservar una bicicleta
 		servicio.reservar(idUsuario, idBicicleta);
@@ -117,29 +127,30 @@ public class ServicioAlquilerTest {
 		LocalDateTime fin = inicio.plusMinutes(180);
 
 		// No hay ninguna reservaActiva o alquilerActivo en este momento
-		assertTrue(usuario.getReservas().isEmpty());
-		assertTrue(usuario.getAlquileres().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().isEmpty());
 
 		// Creamos y añadimos un alquiler que supere el tiempo de uso
 		Alquiler alquiler = new Alquiler(idBicicleta);
 		alquiler.setInicio(inicio);
 		alquiler.setFin(fin);
-
 		usuario.addAlquiler(alquiler);
+		servicioUsuario.actualizar(usuario);
 
+		
 		// Tratamos de reservar una bicicleta
 		servicio.reservar(idUsuario, idBicicleta);
 
 		// Comprobamos que la bicicleta no se ha podido reservar
 		assertTrue(servicioUsuario.recuperar(idUsuario).reservaActiva() == null);
-	}
+ 	}
 
 	@Test
 	public void testConfirmarReserva() throws RepositorioException, EntidadNoEncontrada {
 
 		// No hay ninguna reservaActiva o alquilerActivo en este momento
-		assertTrue(usuario.getReservas().isEmpty());
-		assertTrue(usuario.getAlquileres().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().isEmpty());
 
 		// Reservamos una bicicleta
 		servicio.reservar(idUsuario, idBicicleta);
@@ -156,8 +167,8 @@ public class ServicioAlquilerTest {
 	public void testConfirmarReservaSinReservaActiva() throws RepositorioException, EntidadNoEncontrada {
 
 		// No hay ninguna reservaActiva o alquilerActivo en este momento
-		assertTrue(usuario.getReservas().isEmpty());
-		assertTrue(usuario.getAlquileres().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().isEmpty());
 
 		// Confirmamos la reserva
 		servicio.confirmarReserva(idUsuario);
@@ -171,7 +182,7 @@ public class ServicioAlquilerTest {
 	public void testAlquilar() throws RepositorioException, EntidadNoEncontrada {
 
 		// No hay ningun alquilerActivo en este momento
-		assertTrue(usuario.getAlquileres().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().isEmpty());
 
 		// Alquilamos una bicicleta
 		servicio.alquilar(idUsuario, idBicicleta);
@@ -185,8 +196,8 @@ public class ServicioAlquilerTest {
 	public void testAlquilarConReservaActiva() throws RepositorioException, EntidadNoEncontrada {
 
 		// No hay ninguna reservaActiva o alquilerActivo en este momento
-		assertTrue(usuario.getReservas().isEmpty());
-		assertTrue(usuario.getAlquileres().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().isEmpty());
 
 		// Reservamos una bicicleta
 		servicio.reservar(idUsuario, idBicicleta);
@@ -204,8 +215,8 @@ public class ServicioAlquilerTest {
 	public void testAlquilarConAlquilerActivo() throws RepositorioException, EntidadNoEncontrada {
 
 		// No hay ninguna reservaActiva o alquilerActivo en este momento
-		assertTrue(usuario.getReservas().isEmpty());
-		assertTrue(usuario.getAlquileres().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().isEmpty());
 
 		// Alquilamos una bicicleta
 		servicio.alquilar(idUsuario, idBicicleta);
@@ -227,7 +238,7 @@ public class ServicioAlquilerTest {
 		LocalDateTime caducidad = LocalDateTime.now().minusDays(1);
 
 		// No hay ninguna reserva en este momento
-		assertTrue(usuario.getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
 
 		// Creamos y añadimos 3 reservas ya caducadas al usuario
 		Reserva r1 = new Reserva(idBicicleta, creada, caducidad);
@@ -237,6 +248,7 @@ public class ServicioAlquilerTest {
 		usuario.addReserva(r1);
 		usuario.addReserva(r2);
 		usuario.addReserva(r3);
+		servicioUsuario.actualizar(usuario);
 
 		// Tratamos de reservar una bicicleta
 		servicio.alquilar(idUsuario, idBicicleta);
@@ -253,8 +265,8 @@ public class ServicioAlquilerTest {
 		LocalDateTime fin = inicio.plusMinutes(180);
 
 		// No hay ninguna reservaActiva o alquilerActivo en este momento
-		assertTrue(usuario.getReservas().isEmpty());
-		assertTrue(usuario.getAlquileres().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getReservas().isEmpty());
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().isEmpty());
 
 		// Creamos y añadimos un alquiler que supere el tiempo de uso
 		Alquiler alquiler = new Alquiler(idBicicleta);
@@ -262,12 +274,15 @@ public class ServicioAlquilerTest {
 		alquiler.setFin(fin);
 
 		usuario.addAlquiler(alquiler);
+		servicioUsuario.actualizar(usuario);
 
 		// Tratamos de reservar una bicicleta
-		servicio.alquilar(idUsuario, idBicicleta);
+		servicio.alquilar(idUsuario, idBicicleta2);
 
 		// Comprobamos que la bicicleta no se ha podido reservar
 		assertTrue(servicioUsuario.recuperar(idUsuario).alquilerActivo() == null);
+
+		assertTrue(servicioUsuario.recuperar(idUsuario).getAlquileres().size()==1);
 	}
 	
 	@Test
@@ -285,30 +300,29 @@ public class ServicioAlquilerTest {
 		usuario.addReserva(r1);
 		usuario.addReserva(r2);
 		usuario.addReserva(r3);
-		
+		servicioUsuario.actualizar(usuario);
+
 		// Comprobamos que el usuario esta bloqueado
-		assertTrue(usuario.bloqueado());
+		assertTrue(servicioUsuario.recuperar(idUsuario).bloqueado());
 
 		// Liberamos el bloqueo
 		servicio.liberarBloqueo(idUsuario);
 		
 		// Comprobamos que el usuario ya no esta bloqueado
-		assertFalse(usuario.bloqueado());
+		assertFalse(servicioUsuario.recuperar(idUsuario).bloqueado());
 	}
 
 	@Test
 	public void testLiberarBloqueoNoBloqueado() throws RepositorioException, EntidadNoEncontrada {
-
-		Usuario usuario = servicioUsuario.recuperar(idUsuario);
 		
 		// Comprobamos que el usuario no esta bloqueado
-		assertFalse(usuario.bloqueado());
+		assertFalse(servicioUsuario.recuperar(idUsuario).bloqueado());
 
 		// Liberamos el bloqueo
 		servicio.liberarBloqueo(idUsuario);
 		
 		// Comprobamos que el usuario sigue sin estar bloqueado
-		assertFalse(usuario.bloqueado());
+		assertFalse(servicioUsuario.recuperar(idUsuario).bloqueado());
 	}
 	
 	@Test
