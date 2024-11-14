@@ -1,7 +1,5 @@
 package alquileres;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.LocalDateTime;
 import alquileres.modelo.Alquiler;
 import alquileres.modelo.Reserva;

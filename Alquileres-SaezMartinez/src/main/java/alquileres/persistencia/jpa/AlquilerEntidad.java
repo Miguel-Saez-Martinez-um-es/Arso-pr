@@ -23,12 +23,6 @@ public class AlquilerEntidad implements Serializable, Identificable {
 	private String idBicicleta;
 	private LocalDateTime inicio;
 	private LocalDateTime fin;
-	
-	/*
-	@ManyToOne
-	@JoinColumn(name = "usuario_id")
-    private String idUsuario;
-	*/
 
 
 	public AlquilerEntidad() {
@@ -82,15 +76,5 @@ public class AlquilerEntidad implements Serializable, Identificable {
 	public void setFin(LocalDateTime fin) {
 		this.fin = fin;
 	}
-
-	/*
-	public String getIdUsuario() {
-		return idUsuario;
-	}
-
-	public void setIdUsuario(String idUsuario) {
-		this.idUsuario = idUsuario;
-	}
-	*/
 	
 }

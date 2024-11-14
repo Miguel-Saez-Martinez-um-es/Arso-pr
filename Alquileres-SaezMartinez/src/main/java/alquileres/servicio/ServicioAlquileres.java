@@ -12,11 +12,14 @@ import servicio.FactoriaServicios;
 
 public class ServicioAlquileres implements IServicioAlquileres {
 
-	private IServicioEstaciones servicioEstaciones = FactoriaServicios.getServicio(IServicioEstaciones.class);
+	public IServicioEstaciones servicioEstaciones = FactoriaServicios.getServicio(IServicioEstaciones.class);
 	private IServicioUsuario servicioUsuario = FactoriaServicios.getServicio(IServicioUsuario.class);
-
+	
 	@Override
 	public void reservar(String idUsuario, String idBicicleta) throws RepositorioException, EntidadNoEncontrada {
+	    if (idBicicleta == null) {
+	        throw new IllegalArgumentException("El ID de la bicicleta no puede ser null");
+	    }
 		Usuario usuario = servicioUsuario.recuperar(idUsuario);
 		if (usuario.reservaActiva() == null && usuario.alquilerActivo() == null && !usuario.bloqueado()
 				&& !usuario.superaTiempo()) {
@@ -45,6 +48,9 @@ public class ServicioAlquileres implements IServicioAlquileres {
 
 	@Override
 	public void alquilar(String idUsuario, String idBicicleta) throws RepositorioException, EntidadNoEncontrada {
+	    if (idBicicleta == null) {
+	        throw new IllegalArgumentException("El ID de la bicicleta no puede ser null");
+	    }
 		Usuario usuario = servicioUsuario.recuperar(idUsuario);
 		if (usuario.reservaActiva() == null && usuario.alquilerActivo() == null && !usuario.bloqueado()
 				&& !usuario.superaTiempo()) {
@@ -68,11 +74,13 @@ public class ServicioAlquileres implements IServicioAlquileres {
 
 	@Override
 	public void dejarBicicleta(String idUsuario, String idEstacion) throws RepositorioException, EntidadNoEncontrada {
+	    if (idEstacion == null) {
+	        throw new IllegalArgumentException("El ID de la estacion no puede ser null");
+	    }
 		Usuario usuario = servicioUsuario.recuperar(idUsuario);
 		Alquiler alquiler = usuario.alquilerActivo();
 		if (alquiler != null && servicioEstaciones.tieneHuecoDisponible(idEstacion)) {
 			alquiler.setFin(LocalDateTime.now());
-			// TODO No he actualizado la lista de alquileres del usuario
 			servicioEstaciones.situarBicicleta(alquiler.getIdBicicleta(), idEstacion);
 			servicioUsuario.actualizar(usuario);
 		}
@@ -81,7 +89,6 @@ public class ServicioAlquileres implements IServicioAlquileres {
 	@Override
 	public void liberarBloqueo(String idUsuario) throws RepositorioException, EntidadNoEncontrada {
 		Usuario usuario = servicioUsuario.recuperar(idUsuario);
-		//if (!usuario.getReservas().isEmpty()) {
 			Iterator<Reserva> iterator = usuario.getReservas().iterator();
 			while (iterator.hasNext()) {
 	            Reserva r = iterator.next();
@@ -89,7 +96,6 @@ public class ServicioAlquileres implements IServicioAlquileres {
 	                iterator.remove();
 	            }
 	        }
-		//}
 		servicioUsuario.actualizar(usuario);
 	}
 

@@ -21,12 +21,7 @@ public class ReservaEntidad implements Serializable, Identificable {
 	private String idBicicleta;
 	private LocalDateTime creada;
 	private LocalDateTime caducidad;
-	
-	/*
-	@ManyToOne
-	@JoinColumn(name = "usuario_id")
-    private String idUsuario;
-	*/
+
 	
 	public ReservaEntidad(String idBicicleta, LocalDateTime creada, LocalDateTime caducidad) {
 		this.idBicicleta = idBicicleta;
@@ -82,13 +77,4 @@ public class ReservaEntidad implements Serializable, Identificable {
 		this.caducidad = caducidad;
 	}
 
-	/*
-	public String getUsuario() {
-		return idUsuario;
-	}
-
-	public void setUsuario(String idUsuario) {
-		this.idUsuario = idUsuario;
-	}
-	*/
 }

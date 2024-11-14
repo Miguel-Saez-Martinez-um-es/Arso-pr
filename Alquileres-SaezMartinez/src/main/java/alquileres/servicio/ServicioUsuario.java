@@ -42,6 +42,9 @@ public class ServicioUsuario implements IServicioUsuario {
 
 	@Override
 	public Usuario recuperar(String id) throws RepositorioException, EntidadNoEncontrada {
+	    if (id == null) {
+	        throw new IllegalArgumentException("El ID de usuario no puede ser null");
+	    }
 		for (String s : repositorio.getIds()) {
 			if (s.equals(id)) {
 				return usuarioEntidadAUsuario(repositorio.getById(id));
