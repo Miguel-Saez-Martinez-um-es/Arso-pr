@@ -2,6 +2,7 @@ package alquileres.repositorio;
 
 import java.time.LocalDateTime;
 
+import alquileres.modelo.Roles;
 import alquileres.persistencia.jpa.AlquilerEntidad;
 import alquileres.persistencia.jpa.ReservaEntidad;
 import alquileres.persistencia.jpa.UsuarioEntidad;
@@ -21,24 +22,30 @@ public class RepositorioUsuarioJPA extends RepositorioJPA<UsuarioEntidad>{
 
 	public RepositorioUsuarioJPA() {
 		
+		//Casos de prueba
 		try {
 			
-			String idUsuario = "Usuario Pruebas";
-			String idUsuario2 = "Usuario Pruebas 2";
-			String idBicicleta = "Bicicleta Pruebas";
-			String idBicicleta2 = "Bicicleta Pruebas 2";
-			
+			//Borramos lo anterior
 			for(UsuarioEntidad u : this.getAll()) {
 				delete(u);
 			}
 			
-			UsuarioEntidad u = new UsuarioEntidad(idUsuario);
-			UsuarioEntidad u2 = new UsuarioEntidad(idUsuario2);
 			
+			String idUsuario = "Usuario";
+			String idUsuario2 = "Usuario2";
+			String password = "clave";
+			String password2 = "clave2";
+			String idBicicleta = "Bicicleta";
+			String idBicicleta2 = "Bicicleta2";
+
+			UsuarioEntidad u = new UsuarioEntidad(idUsuario, Roles.GESTOR, password);
+			UsuarioEntidad u2 = new UsuarioEntidad(idUsuario2, Roles.USUARIO, password2);
+
 			
 			AlquilerEntidad a = new AlquilerEntidad();
 			a.setIdBicicleta(idBicicleta);
-			a.setInicio(LocalDateTime.now());
+			a.setInicio(LocalDateTime.now().minusMinutes(35));
+			a.setFin(LocalDateTime.now().minusMinutes(5));
 			
 			ReservaEntidad r = new ReservaEntidad();
 			r.setCreada(LocalDateTime.now());

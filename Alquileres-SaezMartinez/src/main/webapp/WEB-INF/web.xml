@@ -11,7 +11,7 @@
 		<init-param>
 			<!-- Paquetes en los que buscar los servicios-->
 			<param-name>jersey.config.server.provider.packages</param-name>
-			<param-value>alquileres.rest</param-value>
+			<param-value>alquileres.rest, auth</param-value>
 		</init-param>
 
 		<load-on-startup>1</load-on-startup>

@@ -8,10 +8,15 @@ import repositorio.Identificable;
 
 public class Usuario implements Identificable{
 
-	public String id;
-	public List<Reserva> reservas;
-	public List<Alquiler> alquileres;
+	private String id;
+	private List<Reserva> reservas;
+	private List<Alquiler> alquileres;
+	private Roles rol;
+    private String password;
 
+	private static final String CONTRASEÑA_PREDETERMINADA = ".-.-.-.-.-.-.";
+
+	
 	public Usuario() {
 		this.reservas = new LinkedList<Reserva>();
 		this.alquileres = new LinkedList<Alquiler>();
@@ -91,7 +96,23 @@ public class Usuario implements Identificable{
 	public void setId(String id) {
 		this.id = id;
 	}
+	
+	public Roles getRol() {
+		return rol;
+	}
 
+	public void setRol(Roles rol) {
+		this.rol = rol;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
 	public List<Reserva> getReservas() {
 		return reservas;
 	}
@@ -128,9 +149,14 @@ public class Usuario implements Identificable{
 		}
 	}
 	
+	public void setPredeterminado() {
+		this.rol=Roles.USUARIO;
+		this.password=CONTRASEÑA_PREDETERMINADA;
+	}
+	
 	@Override
 	public String toString() {
-		return "Usuario [id=" + id + ", reservas=" + reservas + ", alquileres=" + alquileres + "]";
+		return "Usuario [id=" + id + "rol=" + getRol() + ", reservas=" + getReservas() + ", alquileres=" + getAlquileres() + "]";
 	}
 	
 	

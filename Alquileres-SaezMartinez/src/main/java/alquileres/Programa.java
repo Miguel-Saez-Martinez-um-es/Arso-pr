@@ -1,11 +1,14 @@
 package alquileres;
 
+import java.security.Key;
 import java.time.LocalDateTime;
 import alquileres.modelo.Alquiler;
 import alquileres.modelo.Reserva;
 import alquileres.modelo.Usuario;
 import alquileres.servicio.IServicioAlquileres;
 import alquileres.servicio.IServicioUsuario;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import servicio.FactoriaServicios;
 
 public class Programa {
@@ -109,6 +112,8 @@ public class Programa {
 		System.out.println("Usuario: "+servicioUsuario.recuperar(idUsuario).toString());
 		
 		servicioUsuario.borrar(idUsuario);
+		
+		
 		System.out.println(
 				"-------------------------------------------------------------------------------------------------");
 

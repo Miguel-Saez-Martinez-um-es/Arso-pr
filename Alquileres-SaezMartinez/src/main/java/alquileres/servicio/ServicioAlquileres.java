@@ -16,6 +16,7 @@ public class ServicioAlquileres implements IServicioAlquileres {
 	private IServicioUsuario servicioUsuario = FactoriaServicios.getServicio(IServicioUsuario.class);
 	
 	@Override
+	
 	public void reservar(String idUsuario, String idBicicleta) throws RepositorioException, EntidadNoEncontrada {
 	    if (idBicicleta == null) {
 	        throw new IllegalArgumentException("El ID de la bicicleta no puede ser null");

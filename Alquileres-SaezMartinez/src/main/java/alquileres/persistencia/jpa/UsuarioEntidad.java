@@ -7,15 +7,21 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import alquileres.modelo.Roles;
 import repositorio.Identificable;
 
 @Entity
 @Table(name = "Usuario")
 public class UsuarioEntidad implements Serializable, Identificable {
+	
 	@Id
 	private String id;
 
@@ -25,6 +31,14 @@ public class UsuarioEntidad implements Serializable, Identificable {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<AlquilerEntidad> alquileres;
 
+	@Enumerated(EnumType.STRING)
+	private Roles rol;
+	
+	@Column
+	private String password;
+	
+	private static final String CONTRASEÑA_PREDETERMINADA = ".-.-.-.-.-.-.";
+	
 
 	public UsuarioEntidad(String id) {
 		this.id = id;
@@ -32,12 +46,22 @@ public class UsuarioEntidad implements Serializable, Identificable {
 		this.alquileres = new ArrayList<>();
 	}
 
+	public UsuarioEntidad(String id, Roles rol, String password) {
+		this.id = id;
+		this.reservas = new ArrayList<>();
+		this.alquileres = new ArrayList<>();
+		this.rol=rol;
+		this.password=password;
+	}
+
 	public UsuarioEntidad() {
         this.id = UUID.randomUUID().toString();
 		this.reservas = new ArrayList<>();
 		this.alquileres = new ArrayList<>();
+		this.rol=Roles.USUARIO;
+		this.password=CONTRASEÑA_PREDETERMINADA;
 	}
-
+	
 	public int reservasCaducadas() {
 		int cont = 0;
 		for (ReservaEntidad r : reservas) {
@@ -131,4 +155,22 @@ public class UsuarioEntidad implements Serializable, Identificable {
 	public void addAlquiler(AlquilerEntidad alquiler) {
 		this.alquileres.add(alquiler);
 	}
+	
+	public Roles getRol() {
+		return rol;
+	}
+
+	public void setRol(Roles rol) {
+		this.rol = rol;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+
 }
