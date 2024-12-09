@@ -1,12 +1,15 @@
 package Estaciones.servicio;
 
-import java.time.LocalDate; 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +21,7 @@ import Estaciones.modelo.Historico;
 import Estaciones.repositorio.RepositorioBicis;
 import Estaciones.repositorio.RepositorioEstacion;
 import Estaciones.repositorio.RepositorioHistorico;
-import repositorio.EntidadNoEncontrada;
 import repositorio.RepositorioException;
-
 
 @Service
 @Transactional
@@ -30,16 +31,14 @@ public class ServicioEstacion implements IServicioEstacion {
 	RepositorioHistorico repositorioHistorico;
 	RepositorioBicis repositorioBici;
 
-	
-	
 	@Autowired
-	public ServicioEstacion(RepositorioEstacion repositorioEstacion, RepositorioHistorico repositorioHistorico, RepositorioBicis repositorioBici ) {
+	public ServicioEstacion(RepositorioEstacion repositorioEstacion, RepositorioHistorico repositorioHistorico,
+			RepositorioBicis repositorioBici) {
 		this.repositorioEstacion = repositorioEstacion;
 		this.repositorioHistorico = repositorioHistorico;
 		this.repositorioBici = repositorioBici;
 
 	}
-
 
 	@Override
 	public String crear(Estacion estacion) throws RepositorioException {
@@ -47,23 +46,30 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public void actualizar(Estacion estacion) throws RepositorioException, EntidadNoEncontrada {
+	public void actualizar(Estacion estacion) throws RepositorioException {
 		repositorioEstacion.save(estacion);
 	}
 
 	@Override
-	public Estacion getEstacion(String id) throws RepositorioException, EntidadNoEncontrada {
-		return repositorioEstacion.findById(id).get();
+	public Estacion getEstacion(String id) throws RepositorioException {
+		Optional<Estacion> estacion = repositorioEstacion.findById(id);
+		if (!estacion.isPresent())
+			throw new EntityNotFoundException("no existe la estacion");
+		else
+			return estacion.get();
 	}
 
 	@Override
-	public void borrar(String id) throws RepositorioException, EntidadNoEncontrada {
-		Estacion e = repositorioEstacion.findById(id).get();
-		repositorioEstacion.delete(e);
+	public void borrar(String id) throws RepositorioException {
+		Optional<Estacion> e = repositorioEstacion.findById(id);
+		if (!e.isPresent())
+			throw new EntityNotFoundException("no existe la estacion");
+		else
+			repositorioEstacion.delete(e.get());
 	}
 
 	@Override
-	public List<Estacion> getEstaciones() throws RepositorioException, EntidadNoEncontrada {
+	public List<Estacion> getEstaciones() throws RepositorioException {
 		LinkedList<Estacion> estaciones = new LinkedList<Estacion>();
 		for (Estacion e : repositorioEstacion.findAll()) {
 			estaciones.add(e);
@@ -77,23 +83,31 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public void actualizarBicicleta(Bicicleta bicicleta) throws RepositorioException, EntidadNoEncontrada {
+	public void actualizarBicicleta(Bicicleta bicicleta) throws RepositorioException {
 		repositorioBici.save(bicicleta);
 	}
 
 	@Override
-	public Bicicleta recuperarBicicleta(String idBicicleta) throws RepositorioException, EntidadNoEncontrada {
-		return repositorioBici.findById(idBicicleta).get();
+	public Bicicleta recuperarBicicleta(String idBicicleta) throws RepositorioException {
+		Optional<Bicicleta> bici = repositorioBici.findById(idBicicleta);
+		if (!bici.isPresent())
+			throw new EntityNotFoundException("no existe la bicicleta");
+		else
+			return bici.get();
+
 	}
 
 	@Override
-	public void borrarBicicleta(String idBicicleta) throws RepositorioException, EntidadNoEncontrada {
-		Bicicleta b = repositorioBici.findById(idBicicleta).get();
-		repositorioBici.delete(b);
+	public void borrarBicicleta(String idBicicleta) throws RepositorioException {
+		Optional<Bicicleta> bici = repositorioBici.findById(idBicicleta);
+		if (!bici.isPresent())
+			throw new EntityNotFoundException("no existe la bicicleta");
+		else
+			repositorioBici.delete(bici.get());
 	}
 
 	@Override
-	public List<Bicicleta> getBicicletas() throws RepositorioException, EntidadNoEncontrada {
+	public List<Bicicleta> getBicicletas() throws RepositorioException {
 		LinkedList<Bicicleta> bicicletas = new LinkedList<Bicicleta>();
 		for (Bicicleta b : repositorioBici.findAll()) {
 			bicicletas.add(b);
@@ -111,7 +125,7 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public void actualizarHistorico(Historico historico) throws RepositorioException, EntidadNoEncontrada {
+	public void actualizarHistorico(Historico historico) throws RepositorioException {
 		repositorioHistorico.save(historico);
 	}
 
@@ -119,7 +133,7 @@ public class ServicioEstacion implements IServicioEstacion {
 	// historico de esa bicicleta y estacion
 	@Override
 	public Historico recuperarHistorico(String idBicicleta, String idEstacion)
-			throws RepositorioException, EntidadNoEncontrada {
+			throws RepositorioException {
 		Historico his = new Historico();
 		for (Historico h : repositorioHistorico.findAll()) {
 			if (h.getIdBicicleta().equals(idBicicleta) && h.getIdEstacion().equals(idEstacion)) {
@@ -134,19 +148,19 @@ public class ServicioEstacion implements IServicioEstacion {
 
 	@Override
 	public void borrarHistorico(String idBicicleta, String idEstacion)
-			throws RepositorioException, EntidadNoEncontrada {
+			throws RepositorioException {
 		Historico h = recuperarHistorico(idBicicleta, idEstacion);
 		repositorioHistorico.delete(h);
 
 	}
 
 	@Override
-	public void borrarHistorico(Historico historico) throws RepositorioException, EntidadNoEncontrada {
+	public void borrarHistorico(Historico historico) throws RepositorioException {
 		repositorioHistorico.delete(historico);
 	}
 
 	@Override
-	public List<Historico> getHistoricos() throws RepositorioException, EntidadNoEncontrada {
+	public List<Historico> getHistoricos() throws RepositorioException {
 		LinkedList<Historico> historicos = new LinkedList<Historico>();
 		for (Historico h : repositorioHistorico.findAll()) {
 			historicos.add(h);
@@ -168,11 +182,8 @@ public class ServicioEstacion implements IServicioEstacion {
 		return repositorioEstacion.save(e).getId();
 	}
 
-	
-
-
 	@Override
-	public String altaBicicleta(String modelo, String idEstacion) throws RepositorioException, EntidadNoEncontrada {
+	public String altaBicicleta(String modelo, String idEstacion) throws RepositorioException {
 		Bicicleta b = new Bicicleta();
 		b.setCodigo(UUID.randomUUID().toString());
 		b.setModelo(modelo);
@@ -184,16 +195,17 @@ public class ServicioEstacion implements IServicioEstacion {
 
 	@Override
 	public void estacionarBicicleta(String idBicicleta, String idEstacion)
-			throws RepositorioException, EntidadNoEncontrada {
+			throws RepositorioException {
 		Bicicleta b = recuperarBicicleta(idBicicleta);
 		b.setEstacion(idEstacion);
 		actualizarBicicleta(b);
-		//System.out.println("Historico creado: " + crearHistorico(idBicicleta, idEstacion));
+		// System.out.println("Historico creado: " + crearHistorico(idBicicleta,
+		// idEstacion));
 		crearHistorico(idBicicleta, idEstacion);
 	}
 
 	@Override
-	public void estacionarBicicleta(String idBicicleta) throws RepositorioException, EntidadNoEncontrada {
+	public void estacionarBicicleta(String idBicicleta) throws RepositorioException {
 		String idEstacion = null;
 		int i = 0;
 		LinkedList<Estacion> estaciones = (LinkedList<Estacion>) getEstaciones();
@@ -207,39 +219,42 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public void retirarBicicleta(String idBicicleta) throws RepositorioException, EntidadNoEncontrada {
+	public void retirarBicicleta(String idBicicleta) throws RepositorioException {
 		Bicicleta b = recuperarBicicleta(idBicicleta);
-		Estacion e = repositorioEstacion.findById(b.getEstacion()).get();
-		b.setEstacion(null);
-		Historico h = recuperarHistorico(b.getId(), e.getId());
-		h.setFin(LocalDate.now());
-		actualizarHistorico(h);
+		Optional<Estacion> e = repositorioEstacion.findById(b.getEstacion());
+		if (!e.isPresent()) {
+			throw new EntityNotFoundException("no existe la estacion");
+		} else {
+			b.setEstacion(null);
+			Historico h = recuperarHistorico(b.getId(), e.get().getId());
+			h.setFin(LocalDate.now());
+			actualizarHistorico(h);
+		}
 	}
 
 	@Override
 	public List<Bicicleta> recuperarBicicletasCercanasPosicion(double latitud, double longitud)
-			throws RepositorioException, EntidadNoEncontrada {
-		
+			throws RepositorioException {
+
 		ArrayList<Estacion> estaciones = (ArrayList<Estacion>) getEstaciones().stream()
 				.sorted(Comparator.comparingDouble(estacion -> calcularDistancia(latitud, longitud,
 						estacion.getLatitud(), estacion.getLongitud())))
 				.limit(3).collect(Collectors.toList());
-		
-		//System.out.println("Estaciones en bicicletasCercanas: "+estaciones.size());
-		
+
+		// System.out.println("Estaciones en bicicletasCercanas: "+estaciones.size());
+
 		LinkedList<Bicicleta> bicis = new LinkedList<Bicicleta>();
 		for (Bicicleta bici : getBicicletas()) {
 			for (Estacion e : estaciones) {
-				//System.out.println("Estacion: " + e.getId());
+				// System.out.println("Estacion: " + e.getId());
 				if (bici.getEstacion().equals(e.getId())) {
 					bicis.add(bici);
 				}
 			}
 		}
-		System.out.println("Bicis en bicicletasCercanas: "+bicis.size());
+		System.out.println("Bicis en bicicletasCercanas: " + bicis.size());
 		return bicis;
 	}
-
 
 	@Override
 	public double calcularDistancia(double lat1, double lon1, double lat2, double lon2) {
@@ -248,19 +263,19 @@ public class ServicioEstacion implements IServicioEstacion {
 		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1))
 				* Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		double R = 6371; // Radius of the earth in km
+		double R = 6371;
 		return R * c;
 	}
 
 	@Override
-	public boolean isCompleta(String idEstacion) throws RepositorioException, EntidadNoEncontrada {
+	public boolean isCompleta(String idEstacion) throws RepositorioException {
 		if (bicicletasEnEstacion(idEstacion) < getEstacion(idEstacion).getCapacidad())
 			return true;
 		else
 			return false;
 	}
 
-	public int bicicletasEnEstacion(String idEstacion) throws RepositorioException, EntidadNoEncontrada {
+	public int bicicletasEnEstacion(String idEstacion) throws RepositorioException {
 		Estacion e = getEstacion(idEstacion);
 		int i = 0;
 		for (Bicicleta b : getBicicletas()) {
@@ -274,6 +289,5 @@ public class ServicioEstacion implements IServicioEstacion {
 		}
 		return i;
 	}
-
 
 }

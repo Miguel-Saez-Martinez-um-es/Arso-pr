@@ -3,6 +3,7 @@ package Estaciones;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import Estaciones.modelo.Estacion;
 import Estaciones.repositorio.RepositorioBicis;
 import Estaciones.repositorio.RepositorioEstacion;
 import Estaciones.repositorio.RepositorioHistorico;
@@ -22,6 +23,9 @@ public class programaRepositorio {
 		System.out.println("Bicis: " +repositorioBicis.count());
 		System.out.println("Historicos: " +repositorioH.count());
 
+		System.out.println();
+		for(Estacion e : repositorio.findAll())
+			System.out.println("Estacion: "+e.getId());
 		
 		contexto.close();
 
