@@ -144,7 +144,6 @@ public class ServicioEstacion implements IServicioEstacion {
 		Bicicleta b = recuperarBicicleta(idBicicleta);
 		b.setEstacion(idEstacion);
 		actualizarBicicleta(b);
-
 	}
 
 	@Override
@@ -242,6 +241,14 @@ public class ServicioEstacion implements IServicioEstacion {
 
 	@Override
 	public Page<BicicletaDTO> getListadoPaginadoBicicletas(Pageable pageable, String id) throws Exception {
+		return this.repositorioBici.findByEstacion(id, pageable).map((bicicleta) -> {
+			return new BicicletaDTO(bicicleta.getCodigo(), bicicleta.getModelo(), bicicleta.getEstacion());
+		});
+	}
+	
+	@Override
+	//TODO cambiar para que solo muestre las que no esten en estado disponible o similar
+	public Page<BicicletaDTO> getListadoPaginadoBicicletas2(Pageable pageable, String id) throws Exception {
 		return this.repositorioBici.findByEstacion(id, pageable).map((bicicleta) -> {
 			return new BicicletaDTO(bicicleta.getCodigo(), bicicleta.getModelo(), bicicleta.getEstacion());
 		});

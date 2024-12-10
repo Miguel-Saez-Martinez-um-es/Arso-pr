@@ -56,4 +56,6 @@ public interface IServicioEstacion {
 	Page<EstacionDTO> getListadoPaginadoEstaciones(Pageable pageable) throws Exception;
 	
 	Page<BicicletaDTO> getListadoPaginadoBicicletas(Pageable pageable, String id) throws Exception;
+	
+	Page<BicicletaDTO> getListadoPaginadoBicicletas2(Pageable pageable, String id) throws Exception;
 }

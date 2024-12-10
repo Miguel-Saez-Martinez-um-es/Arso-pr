@@ -1,23 +1,20 @@
 package Estaciones.rest;
 
-import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-
-import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,16 +51,13 @@ public class EstacionesControladorRest {
 	}
 
 	/*
-	Gestor: 
-		Alta de estacion --> altaEstacion() 
-		Alta de bicicleta --> altaBicicleta() 
-		Baja de bicicleta Listado de bicicletas de una estacion
-	
-	Usuario: 
-		Listado de estaciones --> getEstaciones() 
-		Recuperar informacion de Estacion (sin bicicletas) --> getEstacionById() 
-		Listado de bicicletas disponibles en una estacion --> getBicicletasDeEstacion() 
-		Estacionar bicicleta --> estacionar bicicleta
+	 * Gestor: Alta de estacion --> altaEstacion() Alta de bicicleta -->
+	 * altaBicicleta() Baja de bicicleta Listado de bicicletas de una estacion
+	 * 
+	 * Usuario: Listado de estaciones --> getEstaciones() Recuperar informacion de
+	 * Estacion (sin bicicletas) --> getEstacionById() Listado de bicicletas
+	 * disponibles en una estacion --> getBicicletasDeEstacion() Estacionar
+	 * bicicleta --> estacionar bicicleta
 	 */
 
 	// Obtener una estacion concreta
@@ -115,35 +109,40 @@ public class EstacionesControladorRest {
 		if (size <= 0) {
 			size = Math.max(1, servicio.bicicletasEnEstacion(id));
 		}
-		Pageable paginacion = PageRequest.of(page, size);
 
-		Page<BicicletaDTO> resultado = this.servicio.getListadoPaginadoBicicletas(paginacion, id);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		boolean isGestor = authentication.getAuthorities().stream()
+				.anyMatch(authority -> authority.getAuthority().equals("gestor"));
+
+		Pageable paginacion = PageRequest.of(page, size);
+		Page<BicicletaDTO> resultado;
+		if (isGestor) {
+			resultado = this.servicio.getListadoPaginadoBicicletas(paginacion, id);
+		} else {
+			resultado = this.servicio.getListadoPaginadoBicicletas2(paginacion, id);
+		}
 
 		return pagedResourcesAssembler2.toModel(resultado, bicicleta -> {
 			EntityModel<BicicletaDTO> model = EntityModel.of(bicicleta);
-			/*try {
-				model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EstacionesControladorRest.class)
-						.getEstacionById(bicicleta.getCodigo())).withSelfRel());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}*/
 			return model;
 		});
 	}
 
+	// Alta de una estacion
+
+	// curl -X POST -H "Content-Type: application/json" -d
+	// "{\"id\":\"123\",\"nombre\":\"Estación Central\",\"direccion\":\"Calle
+	// Principal 1\",\"capacidad\":10,\"latitud\":40.4168,\"longitud\":-3.7038}"
+	// http://localhost:8080/estaciones/altaestacion -H "Authorization: Bearer
+	// tokenJwt"
+
 	/*
-	Alta de una estacion
-	
-	curl -X POST -H "Content-Type: application/json" -d
-	"{\"id\":\"123\",\"nombre\":\"Estación Central\",\"direccion\":\"Calle Principal 1\",\"capacidad\":10,\"latitud\":40.4168,\"longitud\":-3.7038}"
-	http://localhost:8080/estaciones/altaestacion
-	
-	Postman: http://localhost:8080/estaciones/altaestacion 
-	Json para probar desde postman 
-	{"nombre": "Estación Central", "direccion": "Calle Principal 1",
-	"capacidad": 10, "latitud": 40.4168, "longitud": -3.7038 }
+	 * Postman: http://localhost:8080/estaciones/altaestacion Json para probar desde
+	 * postman {"nombre": "Estación Central", "direccion": "Calle Principal 1",
+	 * "capacidad": 10, "latitud": 40.4168, "longitud": -3.7038 }
 	 */
 	@PostMapping("/altaestacion")
+	//@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<EstacionDTO> altaEstacion(@RequestBody Map<String, Object> jsonBody) throws Exception {
 
 		// Extraer los datos del JSON
@@ -164,19 +163,19 @@ public class EstacionesControladorRest {
 		return model;
 	}
 
-	/* Alta de bicicleta
-
-		curl -i -X POST -H "Content-Type: application/json" \ -d "{"modelo":"Mountain Bike","estacion":"123"}" \ http://localhost:8080/estaciones/altabicicleta
-
-
-			http://localhost:8080/estaciones/altabicicleta
-		{
-		  "modelo": "Mountain Bike",
-		  "estacion": "123"
-		}
-
-	*/
+	/*
+	 * Alta de bicicleta
+	 * 
+	 * curl -i -X POST -H "Content-Type: application/json" \ -d "{"modelo":"Mountain
+	 * Bike","estacion":"123"}" \ http://localhost:8080/estaciones/altabicicleta
+	 * 
+	 * 
+	 * http://localhost:8080/estaciones/altabicicleta { "modelo": "Mountain Bike",
+	 * "estacion": "123" }
+	 * 
+	 */
 	@PostMapping("/altabicicleta")
+	//@PreAuthorize("hasAuthority('gestor') or hasAuthority('usuario')")
 	public EntityModel<BicicletaDTO> altaBicicleta(@RequestBody Map<String, Object> jsonBody) throws Exception {
 
 		// Extraer los datos del JSON
@@ -197,20 +196,20 @@ public class EstacionesControladorRest {
 	// Estacionar bicicleta
 
 	@PutMapping("/{id}/estacionar/{idBicicleta}")
-	public EntityModel<EstacionDTO> estacionarBicicleta(@PathVariable String id, @PathVariable String idBicicleta) throws Exception{
+	//@PreAuthorize("hasAuthority('gestor') or hasAuthority('usuario')")
+	public EntityModel<EstacionDTO> estacionarBicicleta(@PathVariable String id, @PathVariable String idBicicleta)
+			throws Exception {
 		servicio.estacionarBicicleta(idBicicleta, id);
-		if(servicio.recuperarBicicleta(idBicicleta).getEstacion()!=id) {
+		if (servicio.recuperarBicicleta(idBicicleta).getEstacion() != id) {
 			throw new Exception("No se ha podido estacionar la bicicleta");
-		}else {
-			
+		} else {
+
 			Estacion e = servicio.getEstacion(id);
 			EstacionDTO estacion = toEstacionDTO(e);
 			EntityModel<EstacionDTO> model = EntityModel.of(estacion);
 			return model;
 		}
-		
 	}
-
 
 	public EstacionDTO toEstacionDTO(Estacion estacion) throws RepositorioException {
 

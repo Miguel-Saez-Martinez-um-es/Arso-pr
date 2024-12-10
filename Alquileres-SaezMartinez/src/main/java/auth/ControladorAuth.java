@@ -48,13 +48,6 @@ public class ControladorAuth {
 		
 		
         Usuario usuario = servicioUsuario.autenticar(username, password);
-		// La logica va a ser de la siguiente manera:
-
-		// existes en la base de datos y tu contraseña es la misma --> se recupera tu rol
-		// existes en la base de datos pero con otra contraseña --> cancelar operacion
-		// no existes en la base de datos --> nuevo usuario con rol y contraseña predeterminado
-		
-        //Si es distinto de null es el caso 1/3
         if (usuario != null) {
             // Crear claims con la información necesaria
             Map<String, Object> claims = new HashMap<>();

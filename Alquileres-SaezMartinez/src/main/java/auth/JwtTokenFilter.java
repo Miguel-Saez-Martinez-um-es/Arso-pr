@@ -1,6 +1,5 @@
 package auth;
 
-import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -20,13 +19,11 @@ import javax.ws.rs.ext.Provider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class JwtTokenFilter implements ContainerRequestFilter {
 
-	
 	private static final String KEY = "123456789012345678901234567890123456789012345678901234567890";
 
 	@Context
@@ -50,14 +47,10 @@ public class JwtTokenFilter implements ContainerRequestFilter {
 		} else {
 			String token = authorization.substring("Bearer ".length()).trim();
 			try {
-				// cambiado por los problemas de deprecated antes era Claims claims = Jwts.parser().setSigningKey("secreto").parseClaimsJws(token).getBody();
+				// cambiado por los problemas de deprecated antes era Claims claims =
+				// Jwts.parser().setSigningKey("secreto").parseClaimsJws(token).getBody();
 
-
-				Claims claims = Jwts.parserBuilder()
-				                    .setSigningKey(KEY)
-				                    .build()
-				                    .parseClaimsJws(token)
-				                    .getBody();
+				Claims claims = Jwts.parserBuilder().setSigningKey(KEY).build().parseClaimsJws(token).getBody();
 				this.servletRequest.setAttribute("claims", claims);
 
 				Date caducidad = claims.getExpiration();
@@ -67,10 +60,14 @@ public class JwtTokenFilter implements ContainerRequestFilter {
 
 				// control por roles
 				Set<String> roles = new HashSet<>(Arrays.asList(claims.get("roles", String.class).split(",")));
+				
 				// Consulta si la operación está protegida por rol
 				if (this.resourceInfo.getResourceMethod().isAnnotationPresent(RolesAllowed.class)) {
+					
 					String[] allowedRoles = resourceInfo.getResourceMethod().getAnnotation(RolesAllowed.class).value();
+					
 					if (roles.stream().noneMatch(userRole -> Arrays.asList(allowedRoles).contains(userRole))) {
+						
 						requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
 					}
 				}

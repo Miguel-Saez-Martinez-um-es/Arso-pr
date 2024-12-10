@@ -7,9 +7,7 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -41,7 +39,8 @@ public class AlquileresControladorRest {
 	private HttpServletRequest servletRequest;
 
 	// Obtener un usuario en concreto
-	// curl -X GET http://localhost:8080/alquileres/Usuario%20Prueba/
+	// curl -X GET http://localhost:8080/alquileres/Usuario%20Prueba/ -H "Authorization: Bearer tokenJwt"
+
 
 	@GET
 	@Path("{id}")
@@ -71,7 +70,8 @@ public class AlquileresControladorRest {
 	}
 
 	// Obtener todos los usuarios
-	// curl -X GET http://localhost:8080/alquileres
+	// curl -X GET http://localhost:8080/alquileres -H "Authorization: Bearer tokenJwt"
+
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -87,7 +87,8 @@ public class AlquileresControladorRest {
 
 	// Reservar bicicleta
 	// curl -X PUT
-	// http://localhost:8080/alquileres/Usuario%20Prueba/reservar/Bicicleta%20Pruebas%202
+	// http://localhost:8080/alquileres/Usuario%20Prueba/reservar/Bicicleta%20Pruebas%202 -H "Authorization: Bearer tokenJwt"
+
 
 	@PUT
 	@Path("{id}/reservar/{idBicicleta}")
@@ -106,7 +107,8 @@ public class AlquileresControladorRest {
 	}
 
 	// Confirmar reserva
-	// curl -X PUT http://localhost:8080/alquileres/Usuario%20Prueba/confirmar/
+	// curl -X PUT http://localhost:8080/alquileres/Usuario%20Prueba/confirmar/ -H "Authorization: Bearer tokenJwt"
+
 
 	@PUT
 	@Path("{id}/confirmar")
@@ -124,7 +126,8 @@ public class AlquileresControladorRest {
 
 	// Alquilar bicicleta
 	// curl -X PUT
-	// http://localhost:8080/alquileres/Usuario%20Prueba/alquilar/Bicicleta%20Pruebas%202
+	// http://localhost:8080/alquileres/Usuario%20Prueba/alquilar/Bicicleta%20Pruebas%202 -H "Authorization: Bearer tokenJwt"
+
 
 	@PUT
 	@Path("{id}/alquilar/{idBicicleta}")
@@ -142,7 +145,8 @@ public class AlquileresControladorRest {
 
 	// Devolver bicicleta
 	// curl -X PUT
-	// http://localhost:8080/alquileres/Usuario%20Prueba/devolver/Estacion%201
+	// http://localhost:8080/alquileres/Usuario%20Prueba/devolver/Estacion%201 -H "Authorization: Bearer tokenJwt"
+
 
 	@PUT
 	@Path("{id}/devolver/{idEstacion}")
@@ -158,8 +162,9 @@ public class AlquileresControladorRest {
 		}
 	}
 
-	// Liberar bloqueos
-	// curl -X PUT http://localhost:8080/alquileres/liberar/Usuario%20Prueba
+	// Liberar bloqueos 
+	// curl -X PUT http://localhost:8080/alquileres/liberar/Usuario%20Prueba -H "Authorization: Bearer tokenJwt"
+
 
 	@PUT
 	@Path("liberar/{idUsuario}")
