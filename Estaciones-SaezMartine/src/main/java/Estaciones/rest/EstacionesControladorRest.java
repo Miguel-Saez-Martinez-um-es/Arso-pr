@@ -136,13 +136,12 @@ public class EstacionesControladorRest {
 	// http://localhost:8080/estaciones/altaestacion -H "Authorization: Bearer
 	// tokenJwt"
 
-	/*
-	 * Postman: http://localhost:8080/estaciones/altaestacion Json para probar desde
-	 * postman {"nombre": "Estación Central", "direccion": "Calle Principal 1",
-	 * "capacidad": 10, "latitud": 40.4168, "longitud": -3.7038 }
-	 */
+	
+	 // Postman: http://localhost:8080/estaciones/altaestacion Json para probar desde
+	 // {"nombre": "Estacion 3", "direccion": "Calle Principal 1","capacidad": 10, "latitud": 40.4168, "longitud": -3.7038 }
+	
 	@PostMapping("/altaestacion")
-	//@PreAuthorize("hasAuthority('gestor')")
+	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<EstacionDTO> altaEstacion(@RequestBody Map<String, Object> jsonBody) throws Exception {
 
 		// Extraer los datos del JSON
@@ -168,14 +167,13 @@ public class EstacionesControladorRest {
 	 * 
 	 * curl -i -X POST -H "Content-Type: application/json" \ -d "{"modelo":"Mountain
 	 * Bike","estacion":"123"}" \ http://localhost:8080/estaciones/altabicicleta
-	 * 
-	 * 
-	 * http://localhost:8080/estaciones/altabicicleta { "modelo": "Mountain Bike",
-	 * "estacion": "123" }
-	 * 
 	 */
+	  
+	 // http://localhost:8080/estaciones/altabicicleta { "modelo": "Mountain Bike", "estacion": "" }
+	 
+	 
 	@PostMapping("/altabicicleta")
-	//@PreAuthorize("hasAuthority('gestor') or hasAuthority('usuario')")
+	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<BicicletaDTO> altaBicicleta(@RequestBody Map<String, Object> jsonBody) throws Exception {
 
 		// Extraer los datos del JSON
@@ -196,11 +194,11 @@ public class EstacionesControladorRest {
 	// Estacionar bicicleta
 
 	@PutMapping("/{id}/estacionar/{idBicicleta}")
-	//@PreAuthorize("hasAuthority('gestor') or hasAuthority('usuario')")
+	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<EstacionDTO> estacionarBicicleta(@PathVariable String id, @PathVariable String idBicicleta)
 			throws Exception {
 		servicio.estacionarBicicleta(idBicicleta, id);
-		if (servicio.recuperarBicicleta(idBicicleta).getEstacion() != id) {
+		if (servicio.getBicicleta(idBicicleta).getEstacion() != id) {
 			throw new Exception("No se ha podido estacionar la bicicleta");
 		} else {
 
@@ -213,8 +211,11 @@ public class EstacionesControladorRest {
 
 	public EstacionDTO toEstacionDTO(Estacion estacion) throws RepositorioException {
 
+		int huecos = estacion.getCapacidad()-servicio.bicicletasEnEstacion(estacion.getId());
+		
 		EstacionDTO dto = new EstacionDTO(estacion.getId(), estacion.getNombre(), estacion.getDireccion(),
-				estacion.getCapacidad(), estacion.getLatitud(), estacion.getLongitud());
+				estacion.getCapacidad(), huecos,
+				estacion.getLatitud(), estacion.getLongitud());
 		return dto;
 	}
 

@@ -1,13 +1,10 @@
 package Estaciones.servicio;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -41,12 +38,12 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public String crear(Estacion estacion) throws RepositorioException {
+	public String addEstacion(Estacion estacion) throws RepositorioException {
 		return repositorioEstacion.save(estacion).getId();
 	}
 
 	@Override
-	public void actualizar(Estacion estacion) throws RepositorioException {
+	public void updateEstacion(Estacion estacion) throws RepositorioException {
 		repositorioEstacion.save(estacion);
 	}
 
@@ -60,7 +57,7 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public void borrar(String id) throws RepositorioException {
+	public void deleteEstacion(String id) throws RepositorioException {
 		Optional<Estacion> e = repositorioEstacion.findById(id);
 		if (!e.isPresent())
 			throw new EntityNotFoundException("no existe la estacion");
@@ -78,17 +75,17 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public String crearBicicleta(Bicicleta bicicleta) throws RepositorioException {
+	public String addBicicleta(Bicicleta bicicleta) throws RepositorioException {
 		return repositorioBici.save(bicicleta).getCodigo();
 	}
 
 	@Override
-	public void actualizarBicicleta(Bicicleta bicicleta) throws RepositorioException {
+	public void updateBicicleta(Bicicleta bicicleta) throws RepositorioException {
 		repositorioBici.save(bicicleta);
 	}
 
 	@Override
-	public Bicicleta recuperarBicicleta(String idBicicleta) throws RepositorioException {
+	public Bicicleta getBicicleta(String idBicicleta) throws RepositorioException {
 		Optional<Bicicleta> bici = repositorioBici.findById(idBicicleta);
 		if (!bici.isPresent())
 			throw new EntityNotFoundException("no existe la bicicleta");
@@ -98,7 +95,7 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public void borrarBicicleta(String idBicicleta) throws RepositorioException {
+	public void deleteBicicleta(String idBicicleta) throws RepositorioException {
 		Optional<Bicicleta> bici = repositorioBici.findById(idBicicleta);
 		if (!bici.isPresent())
 			throw new EntityNotFoundException("no existe la bicicleta");
@@ -115,7 +112,6 @@ public class ServicioEstacion implements IServicioEstacion {
 		return bicicletas;
 	}
 
-	// Funcion de usuario?
 	@Override
 	public String altaEstacion(String nombre, int capacidad, String direccion, double latitud, double longitud)
 			throws RepositorioException {
@@ -136,14 +132,14 @@ public class ServicioEstacion implements IServicioEstacion {
 		b.setModelo(modelo);
 		b.setFechaAlta(LocalDate.now());
 		b.setEstacion(idEstacion);
-		return crearBicicleta(b);
+		return addBicicleta(b);
 	}
 
 	@Override
 	public void estacionarBicicleta(String idBicicleta, String idEstacion) throws RepositorioException {
-		Bicicleta b = recuperarBicicleta(idBicicleta);
+		Bicicleta b = getBicicleta(idBicicleta);
 		b.setEstacion(idEstacion);
-		actualizarBicicleta(b);
+		updateBicicleta(b);
 	}
 
 	@Override
@@ -162,48 +158,13 @@ public class ServicioEstacion implements IServicioEstacion {
 
 	@Override
 	public void retirarBicicleta(String idBicicleta) throws RepositorioException {
-		Bicicleta b = recuperarBicicleta(idBicicleta);
+		Bicicleta b = getBicicleta(idBicicleta);
 		Optional<Estacion> e = repositorioEstacion.findById(b.getEstacion());
 		if (!e.isPresent()) {
 			throw new EntityNotFoundException("no existe la estacion");
 		} else {
 			b.setEstacion(null);
 		}
-	}
-
-	@Override
-	public List<Bicicleta> recuperarBicicletasCercanasPosicion(double latitud, double longitud)
-			throws RepositorioException {
-
-		ArrayList<Estacion> estaciones = (ArrayList<Estacion>) getEstaciones().stream()
-				.sorted(Comparator.comparingDouble(estacion -> calcularDistancia(latitud, longitud,
-						estacion.getLatitud(), estacion.getLongitud())))
-				.limit(3).collect(Collectors.toList());
-
-		// System.out.println("Estaciones en bicicletasCercanas: "+estaciones.size());
-
-		LinkedList<Bicicleta> bicis = new LinkedList<Bicicleta>();
-		for (Bicicleta bici : getBicicletas()) {
-			for (Estacion e : estaciones) {
-				// System.out.println("Estacion: " + e.getId());
-				if (bici.getEstacion().equals(e.getId())) {
-					bicis.add(bici);
-				}
-			}
-		}
-		System.out.println("Bicis en bicicletasCercanas: " + bicis.size());
-		return bicis;
-	}
-
-	@Override
-	public double calcularDistancia(double lat1, double lon1, double lat2, double lon2) {
-		double dLat = Math.toRadians(lat2 - lat1);
-		double dLon = Math.toRadians(lon2 - lon1);
-		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1))
-				* Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		double R = 6371;
-		return R * c;
 	}
 
 	@Override
@@ -232,9 +193,14 @@ public class ServicioEstacion implements IServicioEstacion {
 	@Override
 	public Page<EstacionDTO> getListadoPaginadoEstaciones(Pageable pageable) throws Exception {
 		return this.repositorioEstacion.findAll(pageable).map((estacion) -> {
-			return new EstacionDTO(estacion.getId(), estacion.getNombre(), estacion.getDireccion(),
-					estacion.getCapacidad(),  estacion.getLatitud(),
-					estacion.getLongitud());
+			try {
+				return new EstacionDTO(estacion.getId(), estacion.getNombre(), estacion.getDireccion(),
+						estacion.getCapacidad(), estacion.getCapacidad()-bicicletasEnEstacion(estacion.getId()), estacion.getLatitud(),
+						estacion.getLongitud());
+			} catch (RepositorioException e) {
+				e.printStackTrace();
+			}
+			return null;
 			
 		});
 	}
@@ -254,17 +220,7 @@ public class ServicioEstacion implements IServicioEstacion {
 		});
 	}
 
-	public EstacionDTO toEstacionDTO(Estacion estacion) throws RepositorioException {
 
-		EstacionDTO dto = new EstacionDTO(estacion.getId(), estacion.getNombre(), estacion.getDireccion(),
-				estacion.getCapacidad(), estacion.getLatitud(), estacion.getLongitud());
-		return dto;
-	}
 
-	public BicicletaDTO toBicicletaDTO(Bicicleta bicicleta) {
-		
-		BicicletaDTO dto = new BicicletaDTO(bicicleta.getCodigo(), bicicleta.getModelo(), bicicleta.getEstacion());
-		return dto;
-	}
 
 }

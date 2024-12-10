@@ -14,7 +14,10 @@ public class EstacionDTO {
 	@Schema(description = "Direccion de la estacion", example = "Calle Mayor, nº 1,")
 	private String direccion;
 	
-	@Schema(description = "Capacidad, en bicicletas, de la estacion")
+	@Schema(description = "Cantidad de huecos disponibles dentro de la estacion", example = "Calle Mayor, nº 1,")
+	private int huecos;
+	
+	@Schema(description = "Capacidad total, en bicicletas, de la estacion")
 	private int capacidad;
 	
 	@Schema(description = "Coordenada latitud de la estacion")
@@ -27,11 +30,12 @@ public class EstacionDTO {
 		
 	}
 	
-	public EstacionDTO(String id, String nombre, String direccion, int capacidad, double latitud,
+	public EstacionDTO(String id, String nombre, String direccion, int capacidad, int huecos, double latitud,
 			double longitud) {
 		this.id = id;
 		this.nombre = nombre;
 		this.direccion = direccion;
+		this.huecos=huecos;
 		this.capacidad = capacidad;
 		this.latitud = latitud;
 		this.longitud = longitud;
@@ -73,6 +77,14 @@ public class EstacionDTO {
 	}
 	public void setLongitud(double longitud) {
 		this.longitud = longitud;
+	}
+
+	public int gethuecos() {
+		return huecos;
+	}
+
+	public void sethuecos(int huecos) {
+		this.huecos = huecos;
 	}
 	
 }

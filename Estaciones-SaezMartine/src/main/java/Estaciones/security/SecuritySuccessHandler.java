@@ -54,9 +54,9 @@ public class SecuritySuccessHandler implements AuthenticationSuccessHandler {
 		}
 
 		if ("Miguel-Saez-Martinez-um-es".equals(login)) {
-			rol = "ROLE_GESTOR";
+			rol = "gestor";
 		} else {
-			rol = "ROLE_USUARIO"; // Rol predeterminado
+			rol = "usuario"; // Rol predeterminado
 		}
 
 		claims.put("sub", login);
