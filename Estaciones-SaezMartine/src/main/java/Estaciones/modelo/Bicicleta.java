@@ -14,8 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Bicicleta{
 
 	@Id
-	private String id;
-
 	private String codigo;
 
 	private String modelo;
@@ -32,12 +30,11 @@ public class Bicicleta{
 	private String estacion;
 
 	public Bicicleta() {
-        this.id = UUID.randomUUID().toString();
+        this.codigo = UUID.randomUUID().toString();
 	}
 
-	public Bicicleta(String id, String codigo, String modelo, LocalDate fechaAlta, LocalDate fechaBaja, String motivo, String estacion) {
-		this.id = UUID.randomUUID().toString();
-		this.codigo = codigo;
+	public Bicicleta( String modelo, LocalDate fechaAlta, LocalDate fechaBaja, String motivo, String estacion) {
+		this.codigo = UUID.randomUUID().toString();
 		this.modelo = modelo;
 		this.fechaAlta = fechaAlta;
 		this.fechaBaja = fechaBaja;
@@ -45,13 +42,6 @@ public class Bicicleta{
 		this.estacion=estacion;
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getCodigo() {
 		return codigo;
@@ -103,7 +93,7 @@ public class Bicicleta{
 
 	@Override
 	public String toString() {
-		return "Bicicleta [id=" + id + ", codigo=" + codigo + ", modelo=" + modelo + ", fechaAlta=" + fechaAlta
+		return "Bicicleta [codigo=" + codigo + ", modelo=" + modelo + ", fechaAlta=" + fechaAlta
 				+ ", fechaBaja=" + fechaBaja + ", motivo=" + motivo + ", estacion=" + estacion + "]";
 	}
 	

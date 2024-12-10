@@ -8,7 +8,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import Estaciones.modelo.Bicicleta;
 import Estaciones.modelo.Estacion;
-import Estaciones.modelo.Historico;
 import Estaciones.servicio.IServicioEstacion;
 
 public class PruebaServicioEstacion {
@@ -116,11 +115,6 @@ public class PruebaServicioEstacion {
 
 		System.out.println();
 
-		System.out.println("*******************Historicos***************************");
-		System.out.println("Historicos:");
-		for (Historico h : servicio.getHistoricos()) {
-			System.out.println(h.toString());
-		}
 
 		System.out.println();
 
@@ -147,13 +141,10 @@ public class PruebaServicioEstacion {
 
 		// Borrar datos
 		for (Bicicleta b : servicio.getBicicletas()) {
-			servicio.borrarBicicleta(b.getId());
+			servicio.borrarBicicleta(b.getCodigo());
 		}
 		for (Estacion e : servicio.getEstaciones()) {
 			servicio.borrar(e.getId());
-		}
-		for (Historico h : servicio.getHistoricos()) {
-			servicio.borrarHistorico(h);
 		}
 		System.out.println(
 				"-------------------------------------------------------------------------------------------------");

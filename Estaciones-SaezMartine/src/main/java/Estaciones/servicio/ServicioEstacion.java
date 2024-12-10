@@ -15,27 +15,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import Estaciones.DTO.BicicletaDTO;
+import Estaciones.DTO.EstacionDTO;
 import Estaciones.modelo.Bicicleta;
 import Estaciones.modelo.Estacion;
-import Estaciones.modelo.Historico;
 import Estaciones.repositorio.RepositorioBicis;
 import Estaciones.repositorio.RepositorioEstacion;
-import Estaciones.repositorio.RepositorioHistorico;
 import repositorio.RepositorioException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional
 public class ServicioEstacion implements IServicioEstacion {
 
 	RepositorioEstacion repositorioEstacion;
-	RepositorioHistorico repositorioHistorico;
 	RepositorioBicis repositorioBici;
 
 	@Autowired
-	public ServicioEstacion(RepositorioEstacion repositorioEstacion, RepositorioHistorico repositorioHistorico,
-			RepositorioBicis repositorioBici) {
+	public ServicioEstacion(RepositorioEstacion repositorioEstacion, RepositorioBicis repositorioBici) {
 		this.repositorioEstacion = repositorioEstacion;
-		this.repositorioHistorico = repositorioHistorico;
 		this.repositorioBici = repositorioBici;
 
 	}
@@ -79,7 +79,7 @@ public class ServicioEstacion implements IServicioEstacion {
 
 	@Override
 	public String crearBicicleta(Bicicleta bicicleta) throws RepositorioException {
-		return repositorioBici.save(bicicleta).getId();
+		return repositorioBici.save(bicicleta).getCodigo();
 	}
 
 	@Override
@@ -115,59 +115,6 @@ public class ServicioEstacion implements IServicioEstacion {
 		return bicicletas;
 	}
 
-	@Override
-	public String crearHistorico(String idBicicleta, String idEstacion) throws RepositorioException {
-		Historico h = new Historico();
-		h.setIdBicicleta(idBicicleta);
-		h.setIdEstacion(idEstacion);
-		h.setInicio(LocalDate.now());
-		return repositorioHistorico.save(h).getId();
-	}
-
-	@Override
-	public void actualizarHistorico(Historico historico) throws RepositorioException {
-		repositorioHistorico.save(historico);
-	}
-
-	// Si hay un Historico no finalizado lo devuelve, si no busca cualquier
-	// historico de esa bicicleta y estacion
-	@Override
-	public Historico recuperarHistorico(String idBicicleta, String idEstacion)
-			throws RepositorioException {
-		Historico his = new Historico();
-		for (Historico h : repositorioHistorico.findAll()) {
-			if (h.getIdBicicleta().equals(idBicicleta) && h.getIdEstacion().equals(idEstacion)) {
-				if (h.getFin() == null)
-					return h;
-				else
-					his = h;
-			}
-		}
-		return his;
-	}
-
-	@Override
-	public void borrarHistorico(String idBicicleta, String idEstacion)
-			throws RepositorioException {
-		Historico h = recuperarHistorico(idBicicleta, idEstacion);
-		repositorioHistorico.delete(h);
-
-	}
-
-	@Override
-	public void borrarHistorico(Historico historico) throws RepositorioException {
-		repositorioHistorico.delete(historico);
-	}
-
-	@Override
-	public List<Historico> getHistoricos() throws RepositorioException {
-		LinkedList<Historico> historicos = new LinkedList<Historico>();
-		for (Historico h : repositorioHistorico.findAll()) {
-			historicos.add(h);
-		}
-		return historicos;
-	}
-
 	// Funcion de usuario?
 	@Override
 	public String altaEstacion(String nombre, int capacidad, String direccion, double latitud, double longitud)
@@ -189,19 +136,15 @@ public class ServicioEstacion implements IServicioEstacion {
 		b.setModelo(modelo);
 		b.setFechaAlta(LocalDate.now());
 		b.setEstacion(idEstacion);
-		crearHistorico(b.getId(), idEstacion);
 		return crearBicicleta(b);
 	}
 
 	@Override
-	public void estacionarBicicleta(String idBicicleta, String idEstacion)
-			throws RepositorioException {
+	public void estacionarBicicleta(String idBicicleta, String idEstacion) throws RepositorioException {
 		Bicicleta b = recuperarBicicleta(idBicicleta);
 		b.setEstacion(idEstacion);
 		actualizarBicicleta(b);
-		// System.out.println("Historico creado: " + crearHistorico(idBicicleta,
-		// idEstacion));
-		crearHistorico(idBicicleta, idEstacion);
+
 	}
 
 	@Override
@@ -226,9 +169,6 @@ public class ServicioEstacion implements IServicioEstacion {
 			throw new EntityNotFoundException("no existe la estacion");
 		} else {
 			b.setEstacion(null);
-			Historico h = recuperarHistorico(b.getId(), e.get().getId());
-			h.setFin(LocalDate.now());
-			actualizarHistorico(h);
 		}
 	}
 
@@ -288,6 +228,36 @@ public class ServicioEstacion implements IServicioEstacion {
 
 		}
 		return i;
+	}
+
+	@Override
+	public Page<EstacionDTO> getListadoPaginadoEstaciones(Pageable pageable) throws Exception {
+		return this.repositorioEstacion.findAll(pageable).map((estacion) -> {
+			return new EstacionDTO(estacion.getId(), estacion.getNombre(), estacion.getDireccion(),
+					estacion.getCapacidad(),  estacion.getLatitud(),
+					estacion.getLongitud());
+			
+		});
+	}
+
+	@Override
+	public Page<BicicletaDTO> getListadoPaginadoBicicletas(Pageable pageable, String id) throws Exception {
+		return this.repositorioBici.findByEstacion(id, pageable).map((bicicleta) -> {
+			return new BicicletaDTO(bicicleta.getCodigo(), bicicleta.getModelo(), bicicleta.getEstacion());
+		});
+	}
+
+	public EstacionDTO toEstacionDTO(Estacion estacion) throws RepositorioException {
+
+		EstacionDTO dto = new EstacionDTO(estacion.getId(), estacion.getNombre(), estacion.getDireccion(),
+				estacion.getCapacidad(), estacion.getLatitud(), estacion.getLongitud());
+		return dto;
+	}
+
+	public BicicletaDTO toBicicletaDTO(Bicicleta bicicleta) {
+		
+		BicicletaDTO dto = new BicicletaDTO(bicicleta.getCodigo(), bicicleta.getModelo(), bicicleta.getEstacion());
+		return dto;
 	}
 
 }

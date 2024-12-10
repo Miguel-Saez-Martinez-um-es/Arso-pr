@@ -1,10 +1,14 @@
 package Estaciones.servicio;
 
-import java.util.List;   
+import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import Estaciones.DTO.BicicletaDTO;
+import Estaciones.DTO.EstacionDTO;
 import Estaciones.modelo.Bicicleta;
 import Estaciones.modelo.Estacion;
-import Estaciones.modelo.Historico;
 import repositorio.RepositorioException;
 
 public interface IServicioEstacion {
@@ -29,18 +33,6 @@ public interface IServicioEstacion {
 	
 	List<Bicicleta> getBicicletas() throws RepositorioException;
 	
-	String crearHistorico(String idBicicleta, String idEstacion) throws RepositorioException;
-
-	void actualizarHistorico(Historico historico) throws RepositorioException;
-
-	Historico recuperarHistorico(String idBicicleta, String idEstacion) throws RepositorioException;
-
-	void borrarHistorico(String idBicicleta, String idEstacion) throws RepositorioException;
-	
-	void borrarHistorico(Historico historico) throws RepositorioException;
-
-	List<Historico> getHistoricos() throws RepositorioException;
-	
 	String altaEstacion(String nombre, int capacidad, String direccion, double latitud, double longitud)
 			throws RepositorioException;
 
@@ -60,4 +52,8 @@ public interface IServicioEstacion {
 	boolean isCompleta(String idEstacion) throws RepositorioException;
 	
 	int bicicletasEnEstacion(String idEstacion) throws RepositorioException;
+	
+	Page<EstacionDTO> getListadoPaginadoEstaciones(Pageable pageable) throws Exception;
+	
+	Page<BicicletaDTO> getListadoPaginadoBicicletas(Pageable pageable, String id) throws Exception;
 }
