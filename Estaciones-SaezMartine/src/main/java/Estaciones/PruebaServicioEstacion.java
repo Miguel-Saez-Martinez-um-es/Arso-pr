@@ -107,7 +107,7 @@ public class PruebaServicioEstacion {
 		System.out.println();
 
 		System.out.println("Estacionamos por defecto " + servicio.getBicicleta(idBici3).getModelo());
-		servicio.estacionarBicicleta(idBici3);
+		servicio.estacionarBicicleta(idBici3,idEstacion2);
 		System.out.println("Hay plazas libres en Estacion 1: " + servicio.isCompleta(idEstacion) + ". Capacidad: "
 				+ servicio.bicicletasEnEstacion(idEstacion) + "/" + servicio.getEstacion(idEstacion).getCapacidad());
 		System.out.println("Hay plazas libres en Estacion 2: " + servicio.isCompleta(idEstacion2) + ". Capacidad: "

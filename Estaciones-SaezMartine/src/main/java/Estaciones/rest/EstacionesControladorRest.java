@@ -114,6 +114,8 @@ public class EstacionesControladorRest {
 		boolean isGestor = authentication.getAuthorities().stream()
 				.anyMatch(authority -> authority.getAuthority().equals("gestor"));
 
+		
+		
 		Pageable paginacion = PageRequest.of(page, size);
 		Page<BicicletaDTO> resultado;
 		if (isGestor) {
@@ -124,6 +126,7 @@ public class EstacionesControladorRest {
 
 		return pagedResourcesAssembler2.toModel(resultado, bicicleta -> {
 			EntityModel<BicicletaDTO> model = EntityModel.of(bicicleta);
+			//aqui seria añadir a cada bicicleta un link a la nueva operacion bajaBicicleta
 			return model;
 		});
 	}
@@ -136,10 +139,10 @@ public class EstacionesControladorRest {
 	// http://localhost:8080/estaciones/altaestacion -H "Authorization: Bearer
 	// tokenJwt"
 
-	
-	 // Postman: http://localhost:8080/estaciones/altaestacion Json para probar desde
-	 // {"nombre": "Estacion 3", "direccion": "Calle Principal 1","capacidad": 10, "latitud": 40.4168, "longitud": -3.7038 }
-	
+	// Postman: http://localhost:8080/estaciones/altaestacion Json para probar desde
+	// {"nombre": "Estacion 3", "direccion": "Calle Principal 1","capacidad": 10,
+	// "latitud": 40.4168, "longitud": -3.7038 }
+
 	@PostMapping("/altaestacion")
 	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<EstacionDTO> altaEstacion(@RequestBody Map<String, Object> jsonBody) throws Exception {
@@ -168,10 +171,10 @@ public class EstacionesControladorRest {
 	 * curl -i -X POST -H "Content-Type: application/json" \ -d "{"modelo":"Mountain
 	 * Bike","estacion":"123"}" \ http://localhost:8080/estaciones/altabicicleta
 	 */
-	  
-	 // http://localhost:8080/estaciones/altabicicleta { "modelo": "Mountain Bike", "estacion": "" }
-	 
-	 
+
+	// http://localhost:8080/estaciones/altabicicleta { "modelo": "Mountain Bike",
+	// "estacion": "" }
+
 	@PostMapping("/altabicicleta")
 	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<BicicletaDTO> altaBicicleta(@RequestBody Map<String, Object> jsonBody) throws Exception {
@@ -185,6 +188,9 @@ public class EstacionesControladorRest {
 		}
 
 		String codigo = servicio.altaBicicleta(modelo, idEstacion);
+		if(codigo == null) {
+			throw new Exception("No se ha podido dar de alta la bicicleta");
+		}
 		BicicletaDTO bicicleta = new BicicletaDTO(codigo, modelo, idEstacion);
 
 		EntityModel<BicicletaDTO> model = EntityModel.of(bicicleta);
@@ -193,29 +199,27 @@ public class EstacionesControladorRest {
 
 	// Estacionar bicicleta
 
+	// curl -X PUT http://localhost:8080/estaciones/{id}/estacionar/{idBici} -H
+	// "Authorization: Bearer tokenJwt"
+
 	@PutMapping("/{id}/estacionar/{idBicicleta}")
 	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<EstacionDTO> estacionarBicicleta(@PathVariable String id, @PathVariable String idBicicleta)
 			throws Exception {
 		servicio.estacionarBicicleta(idBicicleta, id);
-		if (servicio.getBicicleta(idBicicleta).getEstacion() != id) {
-			throw new Exception("No se ha podido estacionar la bicicleta");
-		} else {
 
-			Estacion e = servicio.getEstacion(id);
-			EstacionDTO estacion = toEstacionDTO(e);
-			EntityModel<EstacionDTO> model = EntityModel.of(estacion);
-			return model;
-		}
+		Estacion e = servicio.getEstacion(id);
+		EstacionDTO estacion = toEstacionDTO(e);
+		EntityModel<EstacionDTO> model = EntityModel.of(estacion);
+		return model;
 	}
 
 	public EstacionDTO toEstacionDTO(Estacion estacion) throws RepositorioException {
 
-		int huecos = estacion.getCapacidad()-servicio.bicicletasEnEstacion(estacion.getId());
-		
+		int huecos = estacion.getCapacidad() - servicio.bicicletasEnEstacion(estacion.getId());
+
 		EstacionDTO dto = new EstacionDTO(estacion.getId(), estacion.getNombre(), estacion.getDireccion(),
-				estacion.getCapacidad(), huecos,
-				estacion.getLatitud(), estacion.getLongitud());
+				estacion.getCapacidad(), huecos, estacion.getLatitud(), estacion.getLongitud());
 		return dto;
 	}
 

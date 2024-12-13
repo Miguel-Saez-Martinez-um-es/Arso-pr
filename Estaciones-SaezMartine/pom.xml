@@ -10,7 +10,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>Arso</groupId>
-	<artifactId>Estaciones-SaezMartine</artifactId>
+	<artifactId>Estaciones-2-SaezMartinez</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Estaciones-SaezMartine</name>
 	<description>Estaciones</description>
