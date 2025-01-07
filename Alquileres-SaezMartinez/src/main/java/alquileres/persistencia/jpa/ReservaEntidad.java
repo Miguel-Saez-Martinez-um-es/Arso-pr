@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import repositorio.Identificable;

@@ -39,8 +39,6 @@ public class ConsumidorEventosRabbitMQ {
 					channel.basicAck(envelope.getDeliveryTag(), false);
 				} catch (Exception e) {
 					e.printStackTrace();
-					// Opcionalmente, puedes manejar los errores con un basicNack
-					// channel.basicNack(envelope.getDeliveryTag(), false, true);
 				}
 			}
 		});
@@ -61,11 +59,9 @@ public class ConsumidorEventosRabbitMQ {
 
 		String idBicicleta = eventoMap.get("idBicicleta").toString();
 
-		
-		// Llamar al método del servicio para terminar reservas y alquileres
-		//System.out.println("Procesando evento bicicleta-desactivada para bicicleta: " + idBicicleta);
-		//servicioAlquileres.terminarReservasYAlquileres(idBicicleta);
-		//System.out.println("Reservas y alquileres terminados para bicicleta: " + idBicicleta);
+		System.out.println("Procesando evento de desactivacion de bicicleta para : " + idBicicleta);
+		servicio.bicicletaDesactivada(idBicicleta);
+		System.out.println("Reservas activas terminadas para la bicicleta: " + idBicicleta);
 	}
 
 }

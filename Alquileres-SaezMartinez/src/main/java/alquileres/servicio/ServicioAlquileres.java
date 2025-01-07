@@ -146,4 +146,15 @@ public class ServicioAlquileres implements IServicioAlquileres {
 		}
 	}
 
+	@Override
+	public void bicicletaDesactivada(String id) throws RepositorioException, EntidadNoEncontrada{
+		for (Usuario u : servicioUsuario.recuperarUsuarios()) {
+			System.out.println("\t"+u.reservaActiva());
+			if(u.reservaActiva().getIdBicicleta().equals(id)) {
+				u.removeReserva(u.reservaActiva());
+				servicioUsuario.actualizar(u);
+			}
+		}
+	}
+	
 }

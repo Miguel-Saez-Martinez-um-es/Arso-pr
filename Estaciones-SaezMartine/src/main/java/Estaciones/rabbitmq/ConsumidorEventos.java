@@ -72,8 +72,8 @@ public class ConsumidorEventos {
 	private void procesarEventoBicicletaAlquilerConcluido(String mensaje) {
 		try {
 			// Parsear el mensaje a EventoBicicletaAlquilerConcluido
-			EventoBicicletaAlquilerConcluido evento = objectMapper.readValue(mensaje,
-					EventoBicicletaAlquilerConcluido.class);
+			EventoAlquilerConcluido evento = objectMapper.readValue(mensaje,
+					EventoAlquilerConcluido.class);
 
 			// Validación adicional
 			if (evento.getIdBicicleta() == null || evento.getIdEstacion() == null || evento.getIdBicicleta().isEmpty()

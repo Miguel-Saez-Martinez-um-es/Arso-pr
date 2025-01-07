@@ -1,6 +1,6 @@
 package Estaciones.rabbitmq;
 
-public class EventoBicicletaAlquilerConcluido {
+public class EventoAlquilerConcluido {
 	private String idBicicleta;
 	private String idEstacion;
 	private String fechaFin;

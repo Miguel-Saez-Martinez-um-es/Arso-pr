@@ -21,6 +21,10 @@ public class Programa {
 		String idBicicleta3 = "Modelo3";
 		String idEstacion = "Estacion4";
 		
+		for(Usuario user : servicioUsuario.recuperarUsuarios()) {
+			System.out.println(user);
+			servicioUsuario.borrar(user.getId());
+		}
 
 		
 		System.out.println();
@@ -41,7 +45,7 @@ public class Programa {
 		System.out.println("Usuario: "+servicioUsuario.recuperar(idUsuario).toString());
 		servicio.reservar(idUsuario, idBicicleta2);
 		System.out.println("Usuario: "+servicioUsuario.recuperar(idUsuario).toString());
-		
+
 		System.out.println("\nConfirmamos reserva (La reserva pasa a ser un alquiler)");
 		servicio.confirmarReserva(idUsuario);
 		System.out.println("Usuario: "+servicioUsuario.recuperar(idUsuario).toString());
@@ -107,6 +111,8 @@ public class Programa {
 		
 		servicioUsuario.borrar(idUsuario);
 
+
+		
 		
 		System.out.println(
 				"-------------------------------------------------------------------------------------------------");

@@ -21,4 +21,5 @@ public interface IServicioAlquileres {
 	
 	void eliminarReserva(String idBicicleta)throws RepositorioException, EntidadNoEncontrada;
 	
+	void bicicletaDesactivada(String id) throws RepositorioException, EntidadNoEncontrada;
 }
