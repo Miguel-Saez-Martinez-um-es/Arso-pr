@@ -88,7 +88,7 @@
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>1.5.10</version>
 		</dependency>
-		
+
 		<!-- oauth2-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -102,6 +102,12 @@
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
+		</dependency>
+
+		<!-- Rabbitmq -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
 
 	</dependencies>

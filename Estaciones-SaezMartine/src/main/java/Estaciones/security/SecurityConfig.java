@@ -24,6 +24,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		httpSecurity.httpBasic().disable()
         .csrf().disable() // No puedo usar put o post sin deshabilitar la protección CSRF
 		.authorizeRequests()
+		.antMatchers(
+	            "/estaciones/{nombre}",  // getEstacionById
+	            "/estaciones",           // getEstaciones
+	            "/estaciones/{id}/estacionar/{idBicicleta}" // estacionarBicicleta
+	        ).permitAll()
 		.antMatchers("/publico/**").permitAll()
 		.antMatchers("/estaciones/**").authenticated()
 		.and()

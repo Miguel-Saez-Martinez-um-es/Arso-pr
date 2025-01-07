@@ -8,4 +8,7 @@ import Estaciones.modelo.Estacion;
 @NoRepositoryBean
 public interface RepositorioEstacion extends PagingAndSortingRepository<Estacion, String>{
 	
+	
+	Estacion findByNombre(String Nombre);
+
 }

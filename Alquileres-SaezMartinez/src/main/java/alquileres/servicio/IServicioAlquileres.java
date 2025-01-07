@@ -1,5 +1,7 @@
 package alquileres.servicio;
 
+import java.io.IOException;
+
 import repositorio.EntidadNoEncontrada;
 import repositorio.RepositorioException;
 
@@ -13,8 +15,10 @@ public interface IServicioAlquileres {
 	
 	String historialUsuario(String idUsuario)  throws RepositorioException, EntidadNoEncontrada;
 
-	void dejarBicicleta(String idUsuario, String idEstacion)  throws RepositorioException, EntidadNoEncontrada;
+	void dejarBicicleta(String idUsuario, String idEstacion) throws RepositorioException, EntidadNoEncontrada, IOException;
 	
 	void liberarBloqueo(String idUsuario)  throws RepositorioException, EntidadNoEncontrada;
+	
+	void eliminarReserva(String idBicicleta)throws RepositorioException, EntidadNoEncontrada;
 	
 }

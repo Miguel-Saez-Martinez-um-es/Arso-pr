@@ -2,6 +2,7 @@ package Estaciones.modelo;
 
 import java.time.LocalDate;
 
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,6 +15,7 @@ public class Estacion{
 
 	@Id
     private String id;
+	@NotNull
     private String nombre;
     private int capacidad;
     private String direccion;

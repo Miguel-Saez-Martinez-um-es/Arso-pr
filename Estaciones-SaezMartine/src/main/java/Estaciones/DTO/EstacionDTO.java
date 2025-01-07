@@ -14,7 +14,7 @@ public class EstacionDTO {
 	@Schema(description = "Direccion de la estacion", example = "Calle Mayor, nº 1,")
 	private String direccion;
 	
-	@Schema(description = "Cantidad de huecos disponibles dentro de la estacion", example = "Calle Mayor, nº 1,")
+	@Schema(description = "Cantidad de huecos disponibles dentro de la estacion")
 	private int huecos;
 	
 	@Schema(description = "Capacidad total, en bicicletas, de la estacion")

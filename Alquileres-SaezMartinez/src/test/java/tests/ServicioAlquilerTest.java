@@ -2,6 +2,7 @@ package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.junit.After;
@@ -26,7 +27,7 @@ public class ServicioAlquilerTest {
 	Usuario usuario;
 	IServicioAlquileres servicio;
 	IServicioUsuario servicioUsuario;
-
+	
 	@Before
 	public void setUp() throws Exception {
 		servicio = FactoriaServicios.getServicio(IServicioAlquileres.class);
@@ -34,7 +35,7 @@ public class ServicioAlquilerTest {
 		idUsuario = "Usuario 1";
 		idBicicleta = "Bicicleta 1";
 		idBicicleta2 = "Bicicleta 2";
-		idEstacion = "Estacion 1";
+		idEstacion = "Estacion1";
 		usuario = new Usuario(idUsuario);
 		//servicioUsuario.borrar(idUsuario);
 	}
@@ -361,7 +362,7 @@ public class ServicioAlquilerTest {
 	    }
 	
 	@Test
-	public void testDejarBicicleta() throws RepositorioException, EntidadNoEncontrada {
+	public void testDejarBicicleta() throws RepositorioException, EntidadNoEncontrada, IOException {
 		
 		// Alquilamos una bicicleta
 		servicio.alquilar(idUsuario, idBicicleta);

@@ -15,6 +15,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,15 +64,15 @@ public class EstacionesControladorRest {
 	// Obtener una estacion concreta
 	// curl -X GET http://localhost:8080/estaciones/{id}
 
-	@GetMapping("/{id}")
-	public EntityModel<EstacionDTO> getEstacionById(@PathVariable String id) throws Exception {
-		Estacion e = this.servicio.getEstacion(id);
+	@GetMapping("/{nombre}")
+	public EntityModel<EstacionDTO> getEstacionById(@PathVariable String nombre) throws Exception {
+		Estacion e = this.servicio.getEstacion(nombre);
 		EstacionDTO estacion = toEstacionDTO(e);
 		// retorna el DTO
 
 		EntityModel<EstacionDTO> model = EntityModel.of(estacion);
 		model.add(WebMvcLinkBuilder
-				.linkTo(WebMvcLinkBuilder.methodOn(EstacionesControladorRest.class).getEstacionById(id)).withSelfRel());
+				.linkTo(WebMvcLinkBuilder.methodOn(EstacionesControladorRest.class).getEstacionById(nombre)).withSelfRel());
 		return model;
 	}
 
@@ -91,7 +92,7 @@ public class EstacionesControladorRest {
 			EntityModel<EstacionDTO> model = EntityModel.of(estacion);
 			try {
 				model.add(WebMvcLinkBuilder.linkTo(
-						WebMvcLinkBuilder.methodOn(EstacionesControladorRest.class).getEstacionById(estacion.getId()))
+						WebMvcLinkBuilder.methodOn(EstacionesControladorRest.class).getEstacionById(estacion.getNombre()))
 						.withSelfRel());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -103,32 +104,46 @@ public class EstacionesControladorRest {
 	// Obtener las bicicletas de una estacion
 	// curl -X GET http://localhost:8080/estaciones/{id}/bicicletas
 
-	@GetMapping("/{id}/bicicletas")
-	public PagedModel<EntityModel<BicicletaDTO>> getBicicletasDeEstacion(@PathVariable String id,
-			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "-1") int size) throws Exception {
+	@GetMapping("/{nombre}/bicicletas")
+	public PagedModel<EntityModel<BicicletaDTO>> getBicicletasDeEstacion(@PathVariable String nombre,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "-1") int size) {
 		if (size <= 0) {
-			size = Math.max(1, servicio.bicicletasEnEstacion(id));
+			size = Math.max(1, servicio.bicicletasEnEstacion(nombre));
 		}
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		boolean isGestor = authentication.getAuthorities().stream()
 				.anyMatch(authority -> authority.getAuthority().equals("gestor"));
 
-		
-		
 		Pageable paginacion = PageRequest.of(page, size);
 		Page<BicicletaDTO> resultado;
-		if (isGestor) {
-			resultado = this.servicio.getListadoPaginadoBicicletas(paginacion, id);
-		} else {
-			resultado = this.servicio.getListadoPaginadoBicicletas2(paginacion, id);
-		}
+		resultado = this.servicio.getListadoPaginadoBicicletas(paginacion, nombre);
 
 		return pagedResourcesAssembler2.toModel(resultado, bicicleta -> {
 			EntityModel<BicicletaDTO> model = EntityModel.of(bicicleta);
-			//aqui seria añadir a cada bicicleta un link a la nueva operacion bajaBicicleta
+			if (isGestor) {
+
+				try {
+					model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EstacionesControladorRest.class)
+							.bajaBicicleta(bicicleta.getModelo())).withRel("bajaBicicleta"));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			// aqui seria añadir a cada bicicleta un link a la nueva operacion bajaBicicleta
 			return model;
 		});
+	}
+
+	@DeleteMapping("/bajabicicletas/{Modelo}")
+	@PreAuthorize("hasAuthority('gestor')")
+	public EntityModel<BicicletaDTO> bajaBicicleta(@PathVariable String Modelo) {
+		Bicicleta b = servicio.getBicicleta(Modelo);
+		BicicletaDTO bicicleta = toBicicletaDTO(b);
+		servicio.deleteBicicleta(Modelo);
+
+		EntityModel<BicicletaDTO> model = EntityModel.of(bicicleta);
+		return model;
 	}
 
 	// Alta de una estacion
@@ -188,7 +203,7 @@ public class EstacionesControladorRest {
 		}
 
 		String codigo = servicio.altaBicicleta(modelo, idEstacion);
-		if(codigo == null) {
+		if (codigo == null) {
 			throw new Exception("No se ha podido dar de alta la bicicleta");
 		}
 		BicicletaDTO bicicleta = new BicicletaDTO(codigo, modelo, idEstacion);
@@ -204,19 +219,19 @@ public class EstacionesControladorRest {
 
 	@PutMapping("/{id}/estacionar/{idBicicleta}")
 	@PreAuthorize("hasAuthority('gestor')")
-	public EntityModel<EstacionDTO> estacionarBicicleta(@PathVariable String id, @PathVariable String idBicicleta)
+	public EntityModel<BicicletaDTO> estacionarBicicleta(@PathVariable String id, @PathVariable String idBicicleta)
 			throws Exception {
 		servicio.estacionarBicicleta(idBicicleta, id);
 
-		Estacion e = servicio.getEstacion(id);
-		EstacionDTO estacion = toEstacionDTO(e);
-		EntityModel<EstacionDTO> model = EntityModel.of(estacion);
+		Bicicleta e = servicio.getBicicleta(idBicicleta);
+		BicicletaDTO bicicleta = toBicicletaDTO(e);
+		EntityModel<BicicletaDTO> model = EntityModel.of(bicicleta);
 		return model;
 	}
 
 	public EstacionDTO toEstacionDTO(Estacion estacion) throws RepositorioException {
 
-		int huecos = estacion.getCapacidad() - servicio.bicicletasEnEstacion(estacion.getId());
+		int huecos = estacion.getCapacidad() - servicio.bicicletasEnEstacion(estacion.getNombre());
 
 		EstacionDTO dto = new EstacionDTO(estacion.getId(), estacion.getNombre(), estacion.getDireccion(),
 				estacion.getCapacidad(), huecos, estacion.getLatitud(), estacion.getLongitud());

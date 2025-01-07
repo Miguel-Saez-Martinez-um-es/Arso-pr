@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 
 public class Reserva {
 
-	public String idBicicleta;
-	public LocalDateTime creada;
-	public LocalDateTime caducidad;
+	private String idBicicleta;
+	private LocalDateTime creada;
+	private LocalDateTime caducidad;
 	
 	public Reserva() {
 		

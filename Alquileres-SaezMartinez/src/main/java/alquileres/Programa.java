@@ -1,14 +1,11 @@
 package alquileres;
 
-import java.security.Key;
 import java.time.LocalDateTime;
 import alquileres.modelo.Alquiler;
 import alquileres.modelo.Reserva;
 import alquileres.modelo.Usuario;
 import alquileres.servicio.IServicioAlquileres;
 import alquileres.servicio.IServicioUsuario;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import servicio.FactoriaServicios;
 
 public class Programa {
@@ -18,14 +15,14 @@ public class Programa {
 		IServicioAlquileres servicio = FactoriaServicios.getServicio(IServicioAlquileres.class);
 		IServicioUsuario servicioUsuario = FactoriaServicios.getServicio(IServicioUsuario.class);
 
-		String idUsuario = "Usuario 1";
-		String idBicicleta = "Bicicleta 1";
-		String idBicicleta2 = "Bicicleta 2";
-		String idBicicleta3 = "Bicicleta 3";
-		String idEstacion = "Estacion 1";
+		String idUsuario = "Usuario1";
+		String idBicicleta = "Modelo1";
+		String idBicicleta2 = "Modelo2";
+		String idBicicleta3 = "Modelo3";
+		String idEstacion = "Estacion4";
 		
 
-
+		
 		System.out.println();
 
 		System.out.println(
@@ -45,9 +42,8 @@ public class Programa {
 		servicio.reservar(idUsuario, idBicicleta2);
 		System.out.println("Usuario: "+servicioUsuario.recuperar(idUsuario).toString());
 		
-
-		servicio.confirmarReserva(idUsuario);
 		System.out.println("\nConfirmamos reserva (La reserva pasa a ser un alquiler)");
+		servicio.confirmarReserva(idUsuario);
 		System.out.println("Usuario: "+servicioUsuario.recuperar(idUsuario).toString());
 		
 		
@@ -76,7 +72,6 @@ public class Programa {
 		servicio.liberarBloqueo(idUsuario);
 		System.out.println(servicio.historialUsuario(idUsuario));
 
-		
 
 		
 		/*
@@ -89,7 +84,6 @@ public class Programa {
 		System.out.println("Usuario: "+servicioUsuario.recuperar(idUsuario).toString());
 		*/
 		
-
 		System.out.println("\nAñadimos un alquiler que se pasa de tiempo (aparece un nuevo alquiler con fecha de ayer)");
 		// Creamos y añadimos un alquiler que supere el tiempo de uso
 		LocalDateTime inicio = LocalDateTime.now().minusDays(2);
@@ -112,7 +106,7 @@ public class Programa {
 		System.out.println("Usuario: "+servicioUsuario.recuperar(idUsuario).toString());
 		
 		servicioUsuario.borrar(idUsuario);
-		
+
 		
 		System.out.println(
 				"-------------------------------------------------------------------------------------------------");

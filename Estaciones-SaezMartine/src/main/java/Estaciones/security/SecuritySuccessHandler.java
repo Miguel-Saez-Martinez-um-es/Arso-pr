@@ -33,7 +33,7 @@ public class SecuritySuccessHandler implements AuthenticationSuccessHandler {
 		System.out.println("login: " + login);
 
 		Map<String, Object> claims = fetchUserInfo(usuario);
-
+		// 3600 = 1 hora | 86400 = 1 dia | 2.678.400 = 1 mes de 31 dias
 		Date caducidad = Date.from(Instant.now().plusSeconds(3600));
 
 		String token = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS256, KEY).setExpiration(caducidad)

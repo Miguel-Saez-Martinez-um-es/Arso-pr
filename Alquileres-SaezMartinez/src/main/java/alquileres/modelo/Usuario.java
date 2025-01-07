@@ -156,7 +156,7 @@ public class Usuario implements Identificable{
 	
 	@Override
 	public String toString() {
-		return "Usuario [id=" + id + "rol=" + getRol() + ", reservas=" + getReservas() + ", alquileres=" + getAlquileres() + "]";
+		return "Usuario [id=" + id + ", rol=" + getRol() + ", reservas=" + getReservas() + ", alquileres=" + getAlquileres() + "]";
 	}
 	
 	

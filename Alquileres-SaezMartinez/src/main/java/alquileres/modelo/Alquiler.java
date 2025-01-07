@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 
 public class Alquiler {
 
-	public String idBicicleta;
-	public LocalDateTime inicio;
-	public LocalDateTime fin;
+	private String idBicicleta;
+	private LocalDateTime inicio;
+	private LocalDateTime fin;
 
 	public Alquiler() {
 

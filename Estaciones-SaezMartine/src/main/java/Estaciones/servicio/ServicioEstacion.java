@@ -3,10 +3,7 @@ package Estaciones.servicio;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-
-import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +13,9 @@ import Estaciones.DTO.BicicletaDTO;
 import Estaciones.DTO.EstacionDTO;
 import Estaciones.modelo.Bicicleta;
 import Estaciones.modelo.Estacion;
+import Estaciones.rabbitmq.PublicadorEventos;
 import Estaciones.repositorio.RepositorioBicis;
 import Estaciones.repositorio.RepositorioEstacion;
-import repositorio.RepositorioException;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -27,37 +23,35 @@ import org.springframework.data.domain.Pageable;
 @Transactional
 public class ServicioEstacion implements IServicioEstacion {
 
-	RepositorioEstacion repositorioEstacion;
-	RepositorioBicis repositorioBici;
+	private RepositorioEstacion repositorioEstacion;
+	private RepositorioBicis repositorioBici;
+	private PublicadorEventos publicadorEventos;
 
 	@Autowired
-	public ServicioEstacion(RepositorioEstacion repositorioEstacion, RepositorioBicis repositorioBici) {
+	public ServicioEstacion(RepositorioEstacion repositorioEstacion, RepositorioBicis repositorioBici,
+			PublicadorEventos publicadorEventos) {
 		this.repositorioEstacion = repositorioEstacion;
 		this.repositorioBici = repositorioBici;
+		this.publicadorEventos = publicadorEventos;
 
 	}
 
 	@Override
 	public String addEstacion(Estacion estacion) {
-		return repositorioEstacion.save(estacion).getId();
+		return repositorioEstacion.save(estacion).getNombre();
 	}
 
 	@Override
-	public Estacion getEstacion(String id) {
-		Optional<Estacion> estacion = repositorioEstacion.findById(id);
-		if (!estacion.isPresent())
-			throw new EntityNotFoundException("no existe la estacion");
-		else
-			return estacion.get();
+	public Estacion getEstacion(String nombre) {
+		Estacion estacion = repositorioEstacion.findByNombre(nombre);
+		return estacion;
 	}
 
 	@Override
-	public void deleteEstacion(String id) {
-		Optional<Estacion> e = repositorioEstacion.findById(id);
-		if (!e.isPresent())
-			throw new EntityNotFoundException("no existe la estacion");
-		else
-			repositorioEstacion.delete(e.get());
+	public void deleteEstacion(String nombre) {
+		Estacion e = repositorioEstacion.findByNombre(nombre);
+
+		repositorioEstacion.delete(e);
 	}
 
 	@Override
@@ -71,7 +65,7 @@ public class ServicioEstacion implements IServicioEstacion {
 
 	@Override
 	public String addBicicleta(Bicicleta bicicleta) {
-		return repositorioBici.save(bicicleta).getCodigo();
+		return repositorioBici.save(bicicleta).getModelo();
 	}
 
 	@Override
@@ -80,22 +74,16 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public Bicicleta getBicicleta(String idBicicleta) {
-		Optional<Bicicleta> bici = repositorioBici.findById(idBicicleta);
-		if (!bici.isPresent())
-			throw new EntityNotFoundException("no existe la bicicleta");
-		else
-			return bici.get();
+	public Bicicleta getBicicleta(String modelo) {
+		Bicicleta bici = repositorioBici.findByModelo(modelo);
+		return bici;
 
 	}
 
 	@Override
-	public void deleteBicicleta(String idBicicleta) {
-		Optional<Bicicleta> bici = repositorioBici.findById(idBicicleta);
-		if (!bici.isPresent())
-			throw new EntityNotFoundException("no existe la bicicleta");
-		else
-			repositorioBici.delete(bici.get());
+	public void deleteBicicleta(String modelo) {
+		Bicicleta bici = repositorioBici.findByModelo(modelo);
+		repositorioBici.delete(bici);
 	}
 
 	@Override
@@ -125,7 +113,7 @@ public class ServicioEstacion implements IServicioEstacion {
 	@Override
 	public String altaBicicleta(String modelo, String idEstacion) {
 		if (isCompleta(idEstacion)) {
-			throw new IllegalArgumentException("No se puede dar de alta la bicicleta, la estación esta completa.");
+			return null;
 		} else {
 			Bicicleta b = new Bicicleta();
 			b.setCodigo(UUID.randomUUID().toString());
@@ -137,47 +125,50 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	public void estacionarBicicleta(String idBicicleta, String idEstacion){
+	public void bajaBicicleta(String idBicicleta) {
+		Bicicleta b = getBicicleta(idBicicleta);
+		b.setDisponible(false);
+		b.setFechaBaja(LocalDate.now());
+		updateBicicleta(b);
+		publicadorEventos.publicarEventoBicicletaDesactivada(idBicicleta);
+	}
+
+	@Override
+	public void estacionarBicicleta(String idBicicleta, String idEstacion) {
 		if (isCompleta(idEstacion)) {
-			throw new IllegalArgumentException("No se puede estacionar la bicicleta, la estación esta completa.");
+			throw new IllegalArgumentException(
+					"No se puede estacionar la bicicleta, la estación " + idEstacion + " esta completa.");
 		} else {
 			Bicicleta b = getBicicleta(idBicicleta);
 			b.setEstacion(idEstacion);
+			b.setDisponible(true);
 			updateBicicleta(b);
 		}
 	}
 
 	@Override
-	public void retirarBicicleta(String idBicicleta) {
+	public void alquilarBicicleta(String idBicicleta) {
 		Bicicleta b = getBicicleta(idBicicleta);
-		Optional<Estacion> e = repositorioEstacion.findById(b.getEstacion());
-		if (!e.isPresent()) {
-			throw new EntityNotFoundException("no existe la estacion");
-		} else {
-			b.setEstacion(null);
-		}
+		b.setEstacion(null);
+		b.setDisponible(false);
+		updateBicicleta(b);
 	}
 
 	@Override
 	public boolean isCompleta(String idEstacion) {
-		if (bicicletasEnEstacion(idEstacion) < getEstacion(idEstacion).getCapacidad())
+		if (bicicletasEnEstacion(idEstacion) >= getEstacion(idEstacion).getCapacidad()) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 
 	public int bicicletasEnEstacion(String idEstacion) {
-		Estacion e = getEstacion(idEstacion);
-		int i = 0;
-		for (Bicicleta b : getBicicletas()) {
-			if (b.getEstacion() != null) {
-				if (b.getEstacion().equals(e.getId())) {
-					i++;
-				}
-			}
+		return repositorioBici.findByEstacion(idEstacion).size();
+	}
 
-		}
-		return i;
+	public List<Bicicleta> getBicicletasByEstacion(String idEstacion) {
+		return repositorioBici.findByEstacion(idEstacion);
 	}
 
 	@Override
@@ -190,15 +181,7 @@ public class ServicioEstacion implements IServicioEstacion {
 	}
 
 	@Override
-	// TODO cambiar para que muestre un enlace a una nueva operacion bajabicicleta
-	public Page<BicicletaDTO> getListadoPaginadoBicicletas(Pageable pageable, String id){
-		return this.repositorioBici.findByEstacion(id, pageable).map((bicicleta) -> {
-			return new BicicletaDTO(bicicleta.getCodigo(), bicicleta.getModelo(), bicicleta.getEstacion());
-		});
-	}
-
-	@Override
-	public Page<BicicletaDTO> getListadoPaginadoBicicletas2(Pageable pageable, String id) {
+	public Page<BicicletaDTO> getListadoPaginadoBicicletas(Pageable pageable, String id) {
 		return this.repositorioBici.findByEstacion(id, pageable).map((bicicleta) -> {
 			return new BicicletaDTO(bicicleta.getCodigo(), bicicleta.getModelo(), bicicleta.getEstacion());
 		});

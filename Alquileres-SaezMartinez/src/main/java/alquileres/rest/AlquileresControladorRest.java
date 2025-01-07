@@ -153,6 +153,9 @@ public class AlquileresControladorRest {
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "USUARIO", "GESTOR" })
 	public Response dejarBicicleta(@PathParam("id") String id, @PathParam("idEstacion") String idEstacion) {
+	
+		// Requisitos: El usuario tiene un alquilerActivo. La estación tiene un hueco disponible para el estacionamiento. 
+		// Por tanto primero comprobar el usuario y segundo recuperar la estacion y ver si tiene huecos libres
 		try {
 			servicio.dejarBicicleta(id, idEstacion);
 			return Response.status(Response.Status.OK).entity("Bicicleta devuelta exitosamente.").build();
@@ -202,13 +205,13 @@ public class AlquileresControladorRest {
 		r.setIdBicicleta(reserva.getIdBicicleta());
 
 		if (reserva.getCaducidad() != null) {
-			r.setCaducidad(LocalDateTimetoString(reserva.getCaducidad()));
+			r.setCaducidad(reserva.getCaducidad());
 		} else {
 			r.setCaducidad(null);
 		}
 
 		if (reserva.getCreada() != null) {
-			r.setCreada(LocalDateTimetoString(reserva.getCreada()));
+			r.setCreada(reserva.getCreada());
 		} else {
 			r.setCreada(null);
 		}
@@ -222,14 +225,14 @@ public class AlquileresControladorRest {
 		a.setIdBicicleta(alquiler.getIdBicicleta());
 
 		if (alquiler.getFin() != null) {
-			a.setFin(LocalDateTimetoString(alquiler.getFin()));
+			a.setFin(alquiler.getFin());
 
 		} else {
 			a.setFin(null);
 		}
 
 		if (alquiler.getInicio() != null) {
-			a.setInicio(LocalDateTimetoString(alquiler.getInicio()));
+			a.setInicio(alquiler.getInicio());
 		} else {
 			a.setInicio(null);
 		}
@@ -237,8 +240,4 @@ public class AlquileresControladorRest {
 		return a;
 	}
 
-	public String LocalDateTimetoString(LocalDateTime dateTime) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-		return dateTime.format(formatter);
-	}
 }

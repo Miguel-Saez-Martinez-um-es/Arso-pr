@@ -33,10 +33,12 @@ public interface IServicioEstacion {
 	String altaEstacion(String nombre, int capacidad, String direccion, double latitud, double longitud);
 
 	String altaBicicleta(String modelo, String idEstacion);
+	
+	void bajaBicicleta(String idBicicleta);
 
 	void estacionarBicicleta(String idBicicleta, String idEstacion);
-
-	void retirarBicicleta(String idBicicleta);
+	
+	void alquilarBicicleta(String idBicicleta);
 
 	boolean isCompleta(String idEstacion);
 
@@ -46,5 +48,4 @@ public interface IServicioEstacion {
 
 	Page<BicicletaDTO> getListadoPaginadoBicicletas(Pageable pageable, String id);
 
-	Page<BicicletaDTO> getListadoPaginadoBicicletas2(Pageable pageable, String id);
 }
