@@ -22,7 +22,7 @@ namespace usuarios.Services
         // Solicitud código de activación (Gestor)
         public async Task<string> SolicitarCodigoActivacion(string idUsuario)
         {
-            var codigo = new CodigoActivacionModelo(idUsuario, TimeSpan.FromDays(1));
+            var codigo = new CodigoActivacion(idUsuario, TimeSpan.FromDays(1));
             await _repositorioCodigosActivacion.InsertarAsync(codigo);
             return codigo.Codigo;
         }
@@ -145,7 +145,7 @@ namespace usuarios.Services
         public async Task<List<Claim>> VerificarCredenciales(string nombreUsuario, string contrasena)
         {
             var usuarios = await _repositorioUsuarios.ObtenerTodosAsync();
-            var usuario = usuarios.FirstOrDefault(u => u.NombreUsuario == nombreUsuario && u.Contrasena == contrasena);
+            var usuario = usuarios.FirstOrDefault(u => u.Nombre == nombreUsuario && u.Contrasena == contrasena);
 
             if (usuario == null)
             {

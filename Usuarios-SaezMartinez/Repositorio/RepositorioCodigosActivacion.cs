@@ -5,26 +5,26 @@ using usuarios.Models;
 
 namespace usuarios.Repositories
 {
-    public class RepositorioCodigosActivacion : BaseRepositorio<CodigoActivacionModelo>, IRepositorio<CodigoActivacionModelo>
+    public class RepositorioCodigosActivacion : BaseRepositorio<CodigoActivacion>, IRepositorio<CodigoActivacion>
     {
-        public RepositorioCodigosActivacion() : base("codigoActivacion") { }
+        public RepositorioCodigosActivacion() : base("CodigoActivacion") { }
 
-        public async Task<IEnumerable<CodigoActivacionModelo>> ObtenerTodosAsync()
+        public async Task<IEnumerable<CodigoActivacion>> ObtenerTodosAsync()
         {
             return await _coleccion.Find(_ => true).ToListAsync();
         }
 
-        public async Task<CodigoActivacionModelo> ObtenerPorIdAsync(string id)
+        public async Task<CodigoActivacion> ObtenerPorIdAsync(string id)
         {
             return await _coleccion.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task InsertarAsync(CodigoActivacionModelo entidad)
+        public async Task InsertarAsync(CodigoActivacion entidad)
         {
             await _coleccion.InsertOneAsync(entidad);
         }
 
-        public async Task ActualizarAsync(string id, CodigoActivacionModelo entidad)
+        public async Task ActualizarAsync(string id, CodigoActivacion entidad)
         {
             await _coleccion.ReplaceOneAsync(c => c.Id == id, entidad);
         }
