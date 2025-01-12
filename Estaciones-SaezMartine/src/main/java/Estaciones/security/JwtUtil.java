@@ -1,4 +1,4 @@
-package auth;
+package Estaciones.security;
 
 import java.util.Date;
 import java.util.Map;

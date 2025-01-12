@@ -8,7 +8,7 @@ import retrofit2.http.Body;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
-public interface ServicioUsuario {
+public interface IServicioVerificacion {
 
 	@POST("/api/usuarios/verificar-credenciales")
 	@Headers("Content-Type: application/json")

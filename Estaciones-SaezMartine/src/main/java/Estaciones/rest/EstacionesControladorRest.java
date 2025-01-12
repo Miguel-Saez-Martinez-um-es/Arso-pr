@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import repositorio.RepositorioException;
 
 @RestController
-@RequestMapping("/estaciones")
+@RequestMapping("/Estaciones")
 @Tag(name = "Estaciones", description = "Aplicacion para la gestion de estaciones")
 public class EstacionesControladorRest {
 
@@ -135,7 +135,7 @@ public class EstacionesControladorRest {
 	}
 
 	@PutMapping("/bajabicicletas/{Modelo}")
-	@PreAuthorize("hasAuthority('gestor')")
+	//	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<BicicletaDTO> bajaBicicleta(@PathVariable String Modelo) {
 		System.out.println("BajaBicicleta");
 		Bicicleta b = servicio.getBicicleta(Modelo);
@@ -159,7 +159,7 @@ public class EstacionesControladorRest {
 	// "latitud": 40.4168, "longitud": -3.7038 }
 
 	@PostMapping("/altaestacion")
-	@PreAuthorize("hasAuthority('gestor')")
+//	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<EstacionDTO> altaEstacion(@RequestBody Map<String, Object> jsonBody) throws Exception {
 
 		// Extraer los datos del JSON
@@ -191,7 +191,7 @@ public class EstacionesControladorRest {
 	// "estacion": "" }
 
 	@PostMapping("/altabicicleta")
-	@PreAuthorize("hasAuthority('gestor')")
+	//	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<BicicletaDTO> altaBicicleta(@RequestBody Map<String, Object> jsonBody) throws Exception {
 
 		// Extraer los datos del JSON
@@ -218,7 +218,7 @@ public class EstacionesControladorRest {
 	// "Authorization: Bearer tokenJwt"
 
 	@PutMapping("/{id}/estacionar/{idBicicleta}")
-	@PreAuthorize("hasAuthority('gestor')")
+	//	@PreAuthorize("hasAuthority('gestor')")
 	public EntityModel<BicicletaDTO> estacionarBicicleta(@PathVariable String id, @PathVariable String idBicicleta)
 			throws Exception {
 		servicio.estacionarBicicleta(idBicicleta, id);

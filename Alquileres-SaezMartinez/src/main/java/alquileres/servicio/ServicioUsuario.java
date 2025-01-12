@@ -65,44 +65,9 @@ public class ServicioUsuario implements IServicioUsuario {
 
 	public void setRol(String id, Roles rol) throws RepositorioException, EntidadNoEncontrada {
 		Usuario u = recuperar(id);
-		u.setRol(rol);
 		actualizar(u);
 	}
 
-	@Override
-	public Usuario autenticar(String username, String password) throws RepositorioException, EntidadNoEncontrada {
-
-		// La logica va a ser de la siguiente manera:
-
-		// existes en la base de datos y tu contraseña es la misma --> se recupera tu rol
-		// existes en la base de datos pero con otra contraseña --> cancelar operacion
-		// no existes en la base de datos --> nuevo usuario con rol y contraseña predeterminado
-
-		Usuario usuario = recuperar(username);
-		// creamos el usuario username sin contraseña 
-
-		System.out.println("Usuario autenticando: "+usuario.getId() + " con contraseña: "+ usuario.getPassword());
-		
-		if (usuario.getPassword() != null) {
-			// tenia contraseña previamente por tanto no se ha creado nuevo
-			System.out.println("tenia una cotraseña: " + usuario.getPassword() + " es igual a " + password + "???");
-			if (usuario.getPassword().equals(password)) {
-				//si es la misma contraseña devolvemos el usuario
-				System.out.println("Si, se continua");
-				return usuario;
-			}else {
-				System.out.println("No, se cancela");
-				// no es la misma contraseña por lo que borramos el usuario y cancelamos
-				return null;
-			}
-		}else {
-			System.out.println("Se crea predeterminado");
-			//no tenia contraseña por tanto se acaba de crear --> nuevo usuario con rol y contraseña predeterminado
-			usuario.setPredeterminado();
-			this.actualizar(usuario);
-			return usuario;
-		}
-	}
 
 	public Usuario usuarioEntidadAUsuario(UsuarioEntidad e) {
 		Usuario u = new Usuario();
@@ -113,12 +78,6 @@ public class ServicioUsuario implements IServicioUsuario {
 		if (!e.getReservas().isEmpty())
 			for (ReservaEntidad r : e.getReservas())
 				u.addReserva(reservaEntidadAReserva(r));
-		if (e.getRol() != null) {
-			u.setRol(e.getRol());
-		}
-		if(e.getPassword()!= null) {
-			u.setPassword(e.getPassword());
-		}
 		return u;
 	}
 
@@ -152,9 +111,6 @@ public class ServicioUsuario implements IServicioUsuario {
 		if (!e.getReservas().isEmpty())
 			for (Reserva r : e.getReservas())
 				u.addReserva(reservaAReservaEntidad(r, e.getId()));
-		if (e.getRol() != null) {
-			u.setRol(e.getRol());
-		}
 		return u;
 	}
 

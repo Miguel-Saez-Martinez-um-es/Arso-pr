@@ -8,17 +8,14 @@ public class UsuarioDTO {
     private String id;
     private List<ReservaDTO> reservas;
     private List<AlquilerDTO> alquileres;
-    private Roles rol;
-    private String password;
 	
 
     
     // Constructor
-    public UsuarioDTO(String id, List<ReservaDTO> reservas, List<AlquilerDTO> alquileres, Roles rol, String password) {
+    public UsuarioDTO(String id, List<ReservaDTO> reservas, List<AlquilerDTO> alquileres) {
         this.id = id;
         this.reservas = reservas;
         this.alquileres = alquileres;
-        this.rol=rol;
     }
 
     public UsuarioDTO() {
@@ -50,20 +47,6 @@ public class UsuarioDTO {
 		this.alquileres = alquileres;
 	}
     
-    	public Roles getRol() {
-		return rol;
-	}
 
-	public void setRol(Roles rol) {
-		this.rol = rol;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 	
 }

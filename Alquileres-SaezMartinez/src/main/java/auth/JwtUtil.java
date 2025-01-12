@@ -12,8 +12,8 @@ public class JwtUtil {
 
 	private static final String KEY = "123456789012345678901234567890123456789012345678901234567890";
 	// 3600 = 1 hora | 86400 = 1 dia | 2.678.400 = 1 mes de 31 dias
-	private static final  long TIME = 86400;
-
+	private static final long TIME = 86400;
+	
 	@SuppressWarnings("deprecation")
 	public static String generateToken(Map<String, Object> claims) {
 		return Jwts.builder().setClaims(claims).setIssuedAt(new Date())

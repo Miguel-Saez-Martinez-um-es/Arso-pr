@@ -17,7 +17,7 @@ public class RetrofitConfig {
 	}
 
 	@Bean
-	public ServicioUsuario usuarioService(Retrofit retrofit) {
-		return retrofit.create(ServicioUsuario.class);
+	public IServicioVerificacion usuarioService(Retrofit retrofit) {
+		return retrofit.create(IServicioVerificacion.class);
 	}
 }

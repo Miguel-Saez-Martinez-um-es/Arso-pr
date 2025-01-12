@@ -3,6 +3,7 @@ package alquileres.rest;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -45,7 +46,9 @@ public class AlquileresControladorRest {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "USUARIO", "GESTOR" })
+	@PermitAll
 	public Response getUsuario(@PathParam("id") String id) throws RepositorioException, EntidadNoEncontrada {
+		/*
 		String usuarioPeticion = null;
 		String rol = null;
 		try {
@@ -61,7 +64,7 @@ public class AlquileresControladorRest {
 
 		if (!id.equals(usuarioPeticion) && !"GESTOR".equals(rol)) {
 			return Response.status(Response.Status.FORBIDDEN).entity("Acceso denegado").build();
-		}
+		}*/
 
 		Usuario usuario = servicioUsuario.recuperar(id);
 		UsuarioDTO usuarioDTO = convertirUsuarioADTO(usuario);
@@ -75,6 +78,7 @@ public class AlquileresControladorRest {
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@RolesAllowed("GESTOR")
+	@PermitAll
 	public Response getAllUsuarios() throws RepositorioException, EntidadNoEncontrada {
 		List<UsuarioDTO> usuarios = new LinkedList<UsuarioDTO>();
 		for (Usuario u : servicioUsuario.recuperarUsuarios()) {
@@ -93,6 +97,7 @@ public class AlquileresControladorRest {
 	@Path("{id}/reservar/{idBicicleta}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "USUARIO", "GESTOR" })
+	@PermitAll
 	public Response reservar(@PathParam("id") String id, @PathParam("idBicicleta") String idBicicleta)
 			throws RepositorioException, EntidadNoEncontrada {
 
@@ -113,6 +118,7 @@ public class AlquileresControladorRest {
 	@Path("{id}/confirmar")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "Usuario", "GESTOR" })
+	@PermitAll
 	public Response confirmarReserva(@PathParam("id") String id) {
 		try {
 			servicio.confirmarReserva(id);
@@ -132,6 +138,7 @@ public class AlquileresControladorRest {
 	@Path("{id}/alquilar/{idBicicleta}")
 	@RolesAllowed({ "USUARIO", "GESTOR" })
 	@Produces(MediaType.APPLICATION_JSON)
+	@PermitAll
 	public Response alquilar(@PathParam("id") String id, @PathParam("idBicicleta") String idBicicleta) {
 		try {
 			servicio.alquilar(id, idBicicleta);
@@ -151,6 +158,7 @@ public class AlquileresControladorRest {
 	@Path("{id}/devolver/{idEstacion}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "USUARIO", "GESTOR" })
+	@PermitAll
 	public Response dejarBicicleta(@PathParam("id") String id, @PathParam("idEstacion") String idEstacion) {
 	
 		// Requisitos: El usuario tiene un alquilerActivo. La estación tiene un hueco disponible para el estacionamiento. 
@@ -173,6 +181,7 @@ public class AlquileresControladorRest {
 	@Path("liberar/{idUsuario}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed("GESTOR")
+	@PermitAll
 	public Response liberarBloqueo(@PathParam("idUsuario") String idUsuario) {
 		try {
 			servicio.liberarBloqueo(idUsuario);
@@ -198,7 +207,7 @@ public class AlquileresControladorRest {
 		}
 		
 		
-		return new UsuarioDTO(usuario.getId(), reservasDTO, alquileresDTO, usuario.getRol(), usuario.getPassword());
+		return new UsuarioDTO(usuario.getId(), reservasDTO, alquileresDTO);
 	}
 
 	private ReservaDTO convertirReservaADTO(Reserva reserva) {

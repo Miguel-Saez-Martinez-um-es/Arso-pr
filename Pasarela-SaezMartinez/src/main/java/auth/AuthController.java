@@ -11,28 +11,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import pasarela.retrofit.ServicioUsuario;
+import pasarela.retrofit.IServicioVerificacion;
 import retrofit2.Response;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-	@Autowired
-	private JwtUtil jwtUtil;
 
 	@Autowired
-	private ServicioUsuario usuarioService;
+	private IServicioVerificacion servicioVerificacion;
 
 	@PostMapping("/login")
 	public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credentials) {
 		try {
-			Response<List<Map<String, String>>> response = usuarioService.verificarCredenciales(credentials).execute();
+			Response<List<Map<String, String>>> response = servicioVerificacion.verificarCredenciales(credentials).execute();
 
 			if (response.isSuccessful() && response.body() != null) {
 				List<Map<String, String>> claims = response.body();
 
-				// Extraer datos de claims
 				String userId = claims.stream()
 						.filter(claim -> "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
 								.equals(claim.get("type")))
@@ -51,14 +48,12 @@ public class AuthController {
 					throw new IllegalArgumentException("Respuesta inválida de usuarios.");
 				}
 
-				// Generar token JWT
 				Map<String, Object> jwtClaims = new HashMap<>();
 				jwtClaims.put("nombre", fullName);
 				jwtClaims.put("rol", role);
 
-				String token = jwtUtil.generateToken(jwtClaims);
+				String token = JwtUtil.generateToken(jwtClaims);
 
-				// Respuesta
 				Map<String, Object> result = new HashMap<>();
 				result.put("token", token);
 				result.put("identificador", userId);
@@ -81,7 +76,7 @@ public class AuthController {
 	@PostMapping("/loginOAuth2")
 	public ResponseEntity<Map<String, Object>> loginOAuth2(@RequestBody Map<String, String> oauth2Request) {
 		try {
-			Response<List<Map<String, String>>> response = usuarioService.verificarUsuarioOAuth2(oauth2Request)
+			Response<List<Map<String, String>>> response = servicioVerificacion.verificarUsuarioOAuth2(oauth2Request)
 					.execute();
 
 			if (response.isSuccessful() && response.body() != null) {
@@ -111,7 +106,7 @@ public class AuthController {
 				jwtClaims.put("nombre", fullName);
 				jwtClaims.put("rol", role);
 
-				String token = jwtUtil.generateToken(jwtClaims);
+				String token = JwtUtil.generateToken(jwtClaims);
 
 				// Respuesta
 				Map<String, Object> result = new HashMap<>();
