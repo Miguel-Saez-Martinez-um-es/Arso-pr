@@ -1,0 +1,70 @@
+version: "3.7"
+
+services:
+  rabbitmq: # por defecto, credenciales guest/guest
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - "5672:5672"  # Puerto AMQP
+      - "15672:15672"  # Puerto administraciÃ³n web
+
+  mongo: 
+    image: mongo:7 # en laboratorio 1.6 utiliza la versiÃ³n 4.4.29
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express: 
+    image: mongo-express:1.0.2-20
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_BASICAUTH: false
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+    depends_on:
+      - mongo
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: practicas
+      MYSQL_DATABASE: alquileres
+    ports:
+      - "3306:3306"
+
+  estaciones:
+    build: ./Estaciones-SaezMartine
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:example@mongo:27017/arso?authSource=admin
+      SPRING_RABBITMQ_ADDRESSES: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  alquileres:
+    build: ./Alquileres-SaezMartinez 
+    ports:
+      - "8082:8082" 
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - ESTACIONES_URL=http://estaciones:8080
+      - DB_URL=jdbc:mysql://mysql:3306/alquileres?serverTimezone=CET
+    depends_on:
+      - rabbitmq  
+      - mysql
+
+volumes:
+  mongo_data:
+  mysql_data:

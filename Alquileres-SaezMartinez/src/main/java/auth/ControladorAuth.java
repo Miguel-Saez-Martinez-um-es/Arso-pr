@@ -33,7 +33,7 @@ public class ControladorAuth {
 		
 		Map<String, Object> claims = verificarCredenciales(username, password);
 		if(claims != null) {
-			Date caducidad = Date.from(Instant.now().plusSeconds(3600));
+			Date caducidad = Date.from(Instant.now().plusSeconds(86400));
 			String token = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS256, KEY)
 					.setExpiration(caducidad).compact();
 			return Response.ok(token).build();
@@ -53,7 +53,7 @@ public class ControladorAuth {
             Map<String, Object> claims = new HashMap<>();
             claims.put("sub", usuario.getId());
             claims.put("roles", usuario.getRol());
-            //System.out.println(usuario.toString());
+            System.out.println(usuario.toString());
             return claims;
         }else {
         	// al ser null significa que ha falldo por tanto cancelamos

@@ -5,7 +5,7 @@
 	version="4.0">
 	<display-name>Citybike</display-name>
 
-		<servlet>
+	<servlet>
 		<servlet-name>jersey-servlet</servlet-name>
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
@@ -20,4 +20,8 @@
 		<servlet-name>jersey-servlet</servlet-name>
 		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
+	<!-- Listener para el consumidor RabbitMQ -->
+	<listener>
+		<listener-class>alquileres.rabbitmq.Consumidor</listener-class>
+	</listener>
 </web-app>

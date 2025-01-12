@@ -5,7 +5,7 @@ using usuarios.Models;
 
 namespace usuarios.Repositories
 {
-    public class RepositorioUsuarios : BaseRepositorio<Usuario>, IRepositorio<Usuario>
+    public class RepositorioUsuarios : BaseRepositorio<Usuario>, Repositorio<Usuario>
     {
         public RepositorioUsuarios() : base("usuario") { }
 

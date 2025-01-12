@@ -1,0 +1,199 @@
+Conseguimos el token jwt para el usuario Gestor
+curl -X POST http://localhost:8082/api/auth/login -H "Content-Type: application/x-www-form-urlencoded" -d "username=Usuario&password=clave"
+
+Vemos todos los usuarios del sistema
+curl -X GET http://localhost:8082/api/alquileres/ -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJVc3VhcmlvIiwicm9sZXMiOiJHRVNUT1IiLCJleHAiOjE3MzY2ODA1MjF9.IjceoGxLmbLJ5ahU6qRldbzFKkaema3ACSRIKEo6hNA"
+
+Vemos el usuario en concreto 
+curl -X GET http://localhost:8082/api/alquileres/Usuario -H "Authorization: Bearer tokenJwt"
+
+Confirmamos la reserva 
+curl -X PUT http://localhost:8082/api/alquileres/Usuario/confirmar/ -H "Authorization: Bearer tokenJwt"
+
+Vemos que la reserva pasa a ser un alquiler
+curl -X GET http://localhost:8082/api/alquileres/Usuario -H "Authorization: Bearer tokenJwt" 
+
+Devolvemos la bicicleta dando por terminado el alquiler	//no lo finaliza pq no se comunica con estaciones
+curl -X PUT http://localhost:8082/api/alquileres/Usuario/devolver/Estacion2 -H "Authorization: Bearer tokenJwt"
+
+Vemos que el alquiler ahora tiene fecha de fin
+curl -X GET http://localhost:8082/api/alquileres/Usuario -H "Authorization: Bearer tokenJwt" 
+
+Volvemos a reservar el Modelo2
+curl -X PUT http://localhost:8082/api/alquileres/Usuario/reservar/Modelo2 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJVc3VhcmlvIiwicm9sZXMiOiJHRVNUT1IiLCJleHAiOjE3MzY2ODA1MjF9.IjceoGxLmbLJ5ahU6qRldbzFKkaema3ACSRIKEo6hNA"
+
+*****Baja bicicleta******
+Vemos que desaparece la reserva
+curl -X GET http://localhost:8082/api/alquileres/Usuario -H "Authorization: Bearer tokenJwt" 
+
+
+curl -X PUT http://localhost:8082/api/alquileres/Usuario/reservar/Modelo1 -H "Authorization: Bearer tokenJwt"
+
+curl -X PUT http://localhost:8082/api/alquileres/Usuario/alquilar/Modelo1 -H "Authorization: Bearer tokenJwt"
+
+
+curl -X PUT http://localhost:8082/api/alquileres/liberar/Usuario -H "Authorization: Bearer tokenJwt"
+
+
+token gestor alquileres
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJVc3VhcmlvIiwicm9sZXMiOiJHRVNUT1IiLCJleHAiOjE3MzY2ODA1MjF9.IjceoGxLmbLJ5ahU6qRldbzFKkaema3ACSRIKEo6hNA
+
+
+
+Estaciones:
+
+curl -X GET http://localhost:8080/estaciones -H "Authorization: Bearer tokenJwt"
+
+curl -X GET http://localhost:8080/estaciones/{id} -H "Authorization: Bearer tokenJwt"
+
+curl -X GET http://localhost:8080/estaciones/Estacion2/bicicletas -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNaWd1ZWwtU2Flei1NYXJ0aW5lei11bS1lcyIsImV4cCI6MTczODY5NjQ5NSwicm9sIjoiZ2VzdG9yIn0.lm1i76Gwj5AaCrBT3biCH2LwnjKW-ViKkQBZV9g2QdU"
+
+curl -X PUT http://localhost:8080/estaciones/{id}/estacionar/{idBici} -H "Authorization: Bearer tokenJwt"
+
+curl -X POST -H "Content-Type: application/json" -d "{\"id\":\"123\",\"nombre\":\"Estación Central\",\"direccion\":\"Calle Principal 1\",\"capacidad\":10,\"latitud\":40.4168,\"longitud\":-3.7038}" http://localhost:8080/estaciones/altaestacion -H "Authorization: Bearer tokenJwt"
+
+curl -X POST http://localhost:8080/estaciones/altabicicleta 
+ 
+curl -X PUT  http://localhost:8080/estaciones/bajabicicletas/{Modelo} -H "Authorization: Bearer tokenJwt"
+
+Token para estaciones de 1 mes de duración desde el 4/1/2025
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNaWd1ZWwtU2Flei1NYXJ0aW5lei11bS1lcyIsImV4cCI6MTczODY5NjQ5NSwicm9sIjoiZ2VzdG9yIn0.lm1i76Gwj5AaCrBT3biCH2LwnjKW-ViKkQBZV9g2QdU
+
+
+Bicicletas:
+Modelo1 en la estacion: Estacion1
+Modelo2 en la estacion: Estacion2
+Modelo3 en la estacion: Estacion3
+Modelo4 en la estacion: Estacion3
+
+Estaciones:
+Estacion1 con id: 67799d10570c344904dd1f6d con 1/1 bicicletas. Huecos: 0
+Estacion2 con id: 67799d10570c344904dd1f6e con 1/15 bicicletas. Huecos: 14
+Estacion3 con id: 67799d11570c344904dd1f6f con 2/5 bicicletas. Huecos: 3
+Estacion4 con id: 67799d11570c344904dd1f70 con 0/10 bicicletas. Huecos: 10
+
+
+6758c65f807fd8254d3d584d
+
+a8dfc222-e496-49c9-842b-7f5a8db63c50
+
+
+
+
+
+
+
+
+
+Posibles test para el ejercicio 1
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.impl.DefaultClaims;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import alquileres.modelo.Usuario;
+import alquileres.rest.UsuarioControladorRest;
+import alquileres.servicio.IServicioUsuario;
+
+class UsuarioControladorRestTest {
+
+    private UsuarioControladorRest controlador;
+    private IServicioUsuario servicioUsuario;
+    private HttpServletRequest servletRequest;
+
+    @BeforeEach
+    void setUp() {
+        servicioUsuario = mock(IServicioUsuario.class);
+        servletRequest = mock(HttpServletRequest.class);
+        controlador = new UsuarioControladorRest();
+        controlador.servicioUsuario = servicioUsuario; // Injectar mock del servicio
+        controlador.servletRequest = servletRequest;   // Injectar mock del HttpServletRequest
+    }
+
+    @Test
+    void testGetUsuarioConUsuarioValido() throws Exception {
+        // Crear un Claims válido para "UsuarioPrueba"
+        Claims claims = new DefaultClaims();
+        claims.setSubject("UsuarioPrueba");
+        claims.put("roles", "USUARIO");
+
+        // Configurar el servletRequest para devolver los claims
+        when(servletRequest.getAttribute("claims")).thenReturn(claims);
+
+        // Simular el comportamiento del servicio
+        Usuario usuarioMock = new Usuario("UsuarioPrueba");
+        when(servicioUsuario.recuperar("UsuarioPrueba")).thenReturn(usuarioMock);
+
+        // Llamar al método
+        Response response = controlador.getUsuario("UsuarioPrueba");
+
+        // Verificar la respuesta
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        UsuarioDTO usuarioDTO = (UsuarioDTO) response.getEntity();
+        assertEquals("UsuarioPrueba", usuarioDTO.getId());
+    }
+
+    @Test
+    void testGetUsuarioConTokenDeOtroUsuarioSinRolGestor() throws Exception {
+        // Crear un Claims válido para otro usuario
+        Claims claims = new DefaultClaims();
+        claims.setSubject("OtroUsuario");
+        claims.put("roles", "USUARIO");
+
+        // Configurar el servletRequest para devolver los claims
+        when(servletRequest.getAttribute("claims")).thenReturn(claims);
+
+        // Llamar al método
+        Response response = controlador.getUsuario("UsuarioPrueba");
+
+        // Verificar la respuesta
+        assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void testGetUsuarioConRolGestor() throws Exception {
+        // Crear un Claims válido con rol GESTOR
+        Claims claims = new DefaultClaims();
+        claims.setSubject("OtroUsuario");
+        claims.put("roles", "GESTOR");
+
+        // Configurar el servletRequest para devolver los claims
+        when(servletRequest.getAttribute("claims")).thenReturn(claims);
+
+        // Simular el comportamiento del servicio
+        Usuario usuarioMock = new Usuario("UsuarioPrueba");
+        when(servicioUsuario.recuperar("UsuarioPrueba")).thenReturn(usuarioMock);
+
+        // Llamar al método
+        Response response = controlador.getUsuario("UsuarioPrueba");
+
+        // Verificar la respuesta
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        UsuarioDTO usuarioDTO = (UsuarioDTO) response.getEntity();
+        assertEquals("UsuarioPrueba", usuarioDTO.getId());
+    }
+
+    @Test
+    void testGetUsuarioSinClaims() throws Exception {
+        // Configurar el servletRequest para devolver null
+        when(servletRequest.getAttribute("claims")).thenReturn(null);
+
+        // Llamar al método
+        Response response = controlador.getUsuario("UsuarioPrueba");
+
+        // Verificar la respuesta
+        assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    }
+}

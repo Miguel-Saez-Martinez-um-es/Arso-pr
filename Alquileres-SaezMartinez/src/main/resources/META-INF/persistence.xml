@@ -10,10 +10,6 @@
 		<class>alquileres.persistencia.jpa.AlquilerEntidad</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
-			<property name="javax.persistence.jdbc.user" value="root" />
-			<property name="javax.persistence.jdbc.password" value="practicas" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/alquileres?serverTimezone=CET" />
-			<!--  <property name="eclipselink.ddl-generation" value="create-or-extend-tables" />-->
 			<property name="eclipselink.ddl-generation" value="drop-and-create-tables" />
 			<property name="eclipselink.query-results-cache" value="false" />
 			<property name="eclipselink.cache.shared.default" value="false" />

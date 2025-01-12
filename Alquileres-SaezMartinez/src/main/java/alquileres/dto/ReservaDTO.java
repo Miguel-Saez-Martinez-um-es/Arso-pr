@@ -1,14 +1,13 @@
 package alquileres.dto;
 
-import java.time.LocalDateTime;
 
 public class ReservaDTO {
 	
     private String idBicicleta;
-    private LocalDateTime creada;
-    private LocalDateTime caducidad;
+    private String creada;
+    private String caducidad;
 
-    public ReservaDTO(String idBicicleta, LocalDateTime creada, LocalDateTime caducidad) {
+    public ReservaDTO(String idBicicleta, String creada, String caducidad) {
         this.idBicicleta = idBicicleta;
         this.creada = creada;
         this.caducidad = caducidad;
@@ -22,11 +21,11 @@ public class ReservaDTO {
         return idBicicleta;
     }
 
-    public LocalDateTime getCreada() {
+    public String getCreada() {
         return creada;
     }
 
-    public LocalDateTime getCaducidad() {
+    public String getCaducidad() {
         return caducidad;
     }
 
@@ -34,11 +33,11 @@ public class ReservaDTO {
 		this.idBicicleta = idBicicleta;
 	}
 
-	public void setCreada(LocalDateTime creada) {
+	public void setCreada(String creada) {
 		this.creada = creada;
 	}
 
-	public void setCaducidad(LocalDateTime caducidad) {
+	public void setCaducidad(String caducidad) {
 		this.caducidad = caducidad;
 	}
     

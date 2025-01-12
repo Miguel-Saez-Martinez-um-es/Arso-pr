@@ -1,5 +1,6 @@
 package retrofit;
 
+import alquileres.servicio.IServicioEstacion;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Call;
@@ -26,7 +27,7 @@ public class Programa {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl("http://localhost:8080/")
 				.addConverterFactory(JacksonConverterFactory.create()).client(client).build();
 
-		IEstacionService service = retrofit.create(IEstacionService.class);
+		IServicioEstacion service = retrofit.create(IServicioEstacion.class);
 
 		String idEstacion = "Estacion1";
 		String idBicicletaEnEstacion1 = "Modelo1";

@@ -26,6 +26,7 @@ import io.jsonwebtoken.Claims;
 import repositorio.EntidadNoEncontrada;
 import repositorio.RepositorioException;
 import servicio.FactoriaServicios;
+import utils.DateTimeUtils;
 
 @Path("alquileres")
 public class AlquileresControladorRest {
@@ -37,7 +38,7 @@ public class AlquileresControladorRest {
 	private HttpServletRequest servletRequest;
 
 	// Obtener un usuario en concreto
-	// curl -X GET http://localhost:8080/alquileres/Usuario%20Prueba/ -H "Authorization: Bearer tokenJwt"
+	// curl -X GET http://localhost:8082/api/alquileres/Usuario/ -H "Authorization: Bearer tokenJwt"
 
 
 	@GET
@@ -68,7 +69,7 @@ public class AlquileresControladorRest {
 	}
 
 	// Obtener todos los usuarios
-	// curl -X GET http://localhost:8080/alquileres -H "Authorization: Bearer tokenJwt"
+	// curl -X GET http://localhost:8082/api/alquileres -H "Authorization: Bearer tokenJwt"
 
 
 	@GET
@@ -85,7 +86,7 @@ public class AlquileresControladorRest {
 
 	// Reservar bicicleta
 	// curl -X PUT
-	// http://localhost:8080/alquileres/Usuario%20Prueba/reservar/Bicicleta%20Pruebas%202 -H "Authorization: Bearer tokenJwt"
+	// http://localhost:8082/api/alquileres/Usuario/reservar/Modelo1 -H "Authorization: Bearer tokenJwt"
 
 
 	@PUT
@@ -99,13 +100,13 @@ public class AlquileresControladorRest {
 			servicio.reservar(id, idBicicleta);
 			return Response.status(Response.Status.CREATED).entity("Reserva creada exitosamente.").build();
 		} catch (Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("Error al crear reserva: " + e.getMessage())
+			return Response.status(Response.Status.BAD_REQUEST).entity("Error al confirmar reserva: " + e.getMessage())
 					.build();
 		}
 	}
 
 	// Confirmar reserva
-	// curl -X PUT http://localhost:8080/alquileres/Usuario%20Prueba/confirmar/ -H "Authorization: Bearer tokenJwt"
+	// curl -X PUT http://localhost:8082/api/alquileres/Usuario/confirmar/ -H "Authorization: Bearer tokenJwt"
 
 
 	@PUT
@@ -124,7 +125,7 @@ public class AlquileresControladorRest {
 
 	// Alquilar bicicleta
 	// curl -X PUT
-	// http://localhost:8080/alquileres/Usuario%20Prueba/alquilar/Bicicleta%20Pruebas%202 -H "Authorization: Bearer tokenJwt"
+	// http://localhost:8082/api/alquileres/Usuario/alquilar/Modelo1 -H "Authorization: Bearer tokenJwt"
 
 
 	@PUT
@@ -143,7 +144,7 @@ public class AlquileresControladorRest {
 
 	// Devolver bicicleta
 	// curl -X PUT
-	// http://localhost:8080/alquileres/Usuario%20Prueba/devolver/Estacion%201 -H "Authorization: Bearer tokenJwt"
+	// http://localhost:8082/api/alquileres/Usuario/devolver/Estacion2 -H "Authorization: Bearer tokenJwt"
 
 
 	@PUT
@@ -155,6 +156,7 @@ public class AlquileresControladorRest {
 		// Requisitos: El usuario tiene un alquilerActivo. La estación tiene un hueco disponible para el estacionamiento. 
 		// Por tanto primero comprobar el usuario y segundo recuperar la estacion y ver si tiene huecos libres
 		try {
+			System.out.println("ControladorRest en dejarBicicleta");
 			servicio.dejarBicicleta(id, idEstacion);
 			return Response.status(Response.Status.OK).entity("Bicicleta devuelta exitosamente.").build();
 		} catch (Exception e) {
@@ -164,7 +166,7 @@ public class AlquileresControladorRest {
 	}
 
 	// Liberar bloqueos 
-	// curl -X PUT http://localhost:8080/alquileres/liberar/Usuario%20Prueba -H "Authorization: Bearer tokenJwt"
+	// curl -X PUT http://localhost:8082/api/alquileres/liberar/Usuario -H "Authorization: Bearer tokenJwt"
 
 
 	@PUT
@@ -194,6 +196,8 @@ public class AlquileresControladorRest {
 		for (Alquiler a : usuario.getAlquileres()) {
 			alquileresDTO.add(convertirAlquilerADTO(a));
 		}
+		
+		
 		return new UsuarioDTO(usuario.getId(), reservasDTO, alquileresDTO, usuario.getRol(), usuario.getPassword());
 	}
 
@@ -203,13 +207,13 @@ public class AlquileresControladorRest {
 		r.setIdBicicleta(reserva.getIdBicicleta());
 
 		if (reserva.getCaducidad() != null) {
-			r.setCaducidad(reserva.getCaducidad());
+			r.setCaducidad(DateTimeUtils.toString(reserva.getCaducidad()));
 		} else {
 			r.setCaducidad(null);
 		}
 
 		if (reserva.getCreada() != null) {
-			r.setCreada(reserva.getCreada());
+			r.setCreada(DateTimeUtils.toString(reserva.getCreada()));
 		} else {
 			r.setCreada(null);
 		}
@@ -223,14 +227,14 @@ public class AlquileresControladorRest {
 		a.setIdBicicleta(alquiler.getIdBicicleta());
 
 		if (alquiler.getFin() != null) {
-			a.setFin(alquiler.getFin());
+			a.setFin(DateTimeUtils.toString(alquiler.getFin()));
 
 		} else {
 			a.setFin(null);
 		}
 
 		if (alquiler.getInicio() != null) {
-			a.setInicio(alquiler.getInicio());
+			a.setInicio(DateTimeUtils.toString(alquiler.getInicio()));
 		} else {
 			a.setInicio(null);
 		}

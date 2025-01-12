@@ -56,7 +56,7 @@
 			<version>0.11.2</version>
 		</dependency>
 
-		<!-- LocalDateXmlAdapter.java -->
+		<!-- LocalDateXmlAdapter.java comprobar -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
@@ -167,6 +167,11 @@
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>9.4.53.v20231009</version>
+				<configuration>
+					<httpConnector>
+						<port>8082</port>
+					</httpConnector>
+				</configuration>
 			</plugin>
 
 

@@ -1,14 +1,13 @@
 package alquileres.dto;
 
-import java.time.LocalDateTime;
 
 public class AlquilerDTO {
     private String idBicicleta;
-    private LocalDateTime inicio;
-    private LocalDateTime fin;
+    private String inicio;
+    private String fin;
 
     // Constructor
-    public AlquilerDTO(String idBicicleta, LocalDateTime inicio, LocalDateTime fin) {
+    public AlquilerDTO(String idBicicleta, String inicio, String fin) {
         this.idBicicleta = idBicicleta;
         this.inicio = inicio;
         this.fin = fin;
@@ -23,11 +22,11 @@ public class AlquilerDTO {
         return idBicicleta;
     }
 
-    public LocalDateTime getInicio() {
+    public String getInicio() {
         return inicio;
     }
 
-    public LocalDateTime getFin() {
+    public String getFin() {
         return fin;
     }
 
@@ -35,11 +34,11 @@ public class AlquilerDTO {
 		this.idBicicleta = idBicicleta;
 	}
 
-	public void setInicio(LocalDateTime inicio) {
+	public void setInicio(String inicio) {
 		this.inicio = inicio;
 	}
 
-	public void setFin(LocalDateTime fin) {
+	public void setFin(String fin) {
 		this.fin = fin;
 	}
     

@@ -12,14 +12,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import repositorio.EntidadNoEncontrada;
 import repositorio.RepositorioException;
-import retrofit.IEstacionService;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import servicio.FactoriaServicios;
 
 public class ServicioAlquileres implements IServicioAlquileres {
 
-	public IEstacionService servicioEstaciones;
+	public IServicioEstacion servicioEstaciones;
 	private IServicioUsuario servicioUsuario = FactoriaServicios.getServicio(IServicioUsuario.class);
 	private final PublicadorEventosRabbitMQ publicadorEventos = new PublicadorEventosRabbitMQ();
 
@@ -33,10 +32,10 @@ public class ServicioAlquileres implements IServicioAlquileres {
 			Request newRequest = originalRequest.newBuilder().header("Authorization", "Bearer " + jwtToken).build();
 			return chain.proceed(newRequest);
 		}).build();
-
-		servicioEstaciones = new Retrofit.Builder().baseUrl("http://localhost:8080/")
-				.addConverterFactory(JacksonConverterFactory.create()).client(client).build()
-				.create(IEstacionService.class);
+		String url = System.getenv("ESTACIONES_URL") != null ? System.getenv("ESTACIONES_URL")
+				: "http://localhost:8080/";
+		servicioEstaciones = new Retrofit.Builder().baseUrl(url).addConverterFactory(JacksonConverterFactory.create())
+				.client(client).build().create(IServicioEstacion.class);
 	}
 
 	@Override
@@ -101,25 +100,39 @@ public class ServicioAlquileres implements IServicioAlquileres {
 				+ usuario.bloqueado() + ", Tiempo de uso: " + usuario.tiempoUsoSemana() + "]";
 	}
 
+	// Comprobar si se pone la fecha de fin sobre el alquilerActivo del usuario
 	@Override
 	public void dejarBicicleta(String idUsuario, String idEstacion)
 			throws RepositorioException, EntidadNoEncontrada, IOException {
+		System.out.println("\tServicioAlquiler dejarBicicleta");
 		if (idEstacion == null) {
 			throw new IllegalArgumentException("El ID de la estacion no puede ser null");
 		}
+		if (idUsuario == null) {
+			throw new IllegalArgumentException("El ID del usuario no puede ser null");
+		}
 		Usuario usuario = servicioUsuario.recuperar(idUsuario);
-		Alquiler alquiler = usuario.alquilerActivo();
+
+		System.out.println("\t Usuario: " + idUsuario + "En Estacion: " + idEstacion);
+
 		// deberia comprobar
-		// servicioEstaciones.getEstacion(idEstacion).execute().body().getHuecos()
-		if (alquiler != null && servicioEstaciones.getEstacion(idEstacion).execute().body().getHuecos() > 0) {
-			alquiler.setFin(LocalDateTime.now());
-			servicioEstaciones.estacionarBicicleta(alquiler.getIdBicicleta(), idEstacion);
+		// Call<EstacionPOJO> call = servicioEstaciones.getEstacion(idEstacion);
+		// Response<EstacionPOJO> response = call.execute();
+		// if(response.isSuccessful()) {
+		// int huecos = response.body().getHuecos();
+		// }
+
+		if (usuario.alquilerActivo() != null /* && huecos > 0 */) {
+			System.out.println("Dejamos la bicicleta");
+			String mensaje = "{ \"idBicicleta\": \"" + usuario.alquilerActivo().getIdBicicleta() + "\", "
+					+ "\"idEstacion\": \"" + idEstacion + "\", " + "\"fechaFin\": \""
+					+ usuario.alquilerActivo().getFin() + "\" }";
+
+			servicioEstaciones.estacionarBicicleta(usuario.alquilerActivo().getIdBicicleta(), idEstacion);
+			usuario.alquilerActivo().setFin(LocalDateTime.now());
 			servicioUsuario.actualizar(usuario);
 
-			String mensaje = "{ \"idBicicleta\": \"" + alquiler.getIdBicicleta() + "\", " + "\"idEstacion\": \""
-					+ idEstacion + "\", " + "\"fechaFin\": \"" + alquiler.getFin() + "\" }";
-			publicadorEventos.publicarEvento("citybike.alquileres.bicicleta-alquiler-concluido",
-					mensaje);
+			publicadorEventos.publicarEvento("citybike.alquileres.bicicleta-alquiler-concluido", mensaje);
 		}
 	}
 
@@ -147,14 +160,17 @@ public class ServicioAlquileres implements IServicioAlquileres {
 	}
 
 	@Override
-	public void bicicletaDesactivada(String id) throws RepositorioException, EntidadNoEncontrada{
-		for (Usuario u : servicioUsuario.recuperarUsuarios()) {
-			System.out.println("\t"+u.reservaActiva());
-			if(u.reservaActiva().getIdBicicleta().equals(id)) {
-				u.removeReserva(u.reservaActiva());
-				servicioUsuario.actualizar(u);
-			}
-		}
+	public void bicicletaDesactivada(String id) throws RepositorioException, EntidadNoEncontrada {
+	    for (Usuario u : servicioUsuario.recuperarUsuarios()) {
+	        Reserva reserva = u.reservaActiva();
+	        if (reserva != null && id.equals(reserva.getIdBicicleta())) {
+	            u.removeReserva(reserva);
+	            servicioUsuario.actualizar(u);
+	            System.out.println("Reserva eliminada para la bicicleta: " + id);
+	        } else {
+	            System.out.println("No se encontró una reserva activa para la bicicleta: " + id);
+	        }
+	    }
 	}
-	
+
 }

@@ -35,8 +35,8 @@ public class RepositorioUsuarioJPA extends RepositorioJPA<UsuarioEntidad>{
 			String idUsuario2 = "Usuario2";
 			String password = "clave";
 			String password2 = "clave2";
-			String idBicicleta = "Bicicleta";
-			String idBicicleta2 = "Bicicleta2";
+			String idBicicleta = "Modelo1";
+			String idBicicleta2 = "Modelo2";
 
 			UsuarioEntidad u = new UsuarioEntidad(idUsuario, Roles.GESTOR, password);
 			UsuarioEntidad u2 = new UsuarioEntidad(idUsuario2, Roles.USUARIO, password2);

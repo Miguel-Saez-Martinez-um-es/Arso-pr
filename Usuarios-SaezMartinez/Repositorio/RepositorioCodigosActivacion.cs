@@ -5,9 +5,9 @@ using usuarios.Models;
 
 namespace usuarios.Repositories
 {
-    public class RepositorioCodigosActivacion : BaseRepositorio<CodigoActivacion>, IRepositorio<CodigoActivacion>
+    public class RepositorioCodigosActivacion : BaseRepositorio<CodigoActivacion>, Repositorio<CodigoActivacion>
     {
-        public RepositorioCodigosActivacion() : base("CodigoActivacion") { }
+        public RepositorioCodigosActivacion() : base("codigoActivacion") { }
 
         public async Task<IEnumerable<CodigoActivacion>> ObtenerTodosAsync()
         {
