@@ -19,7 +19,6 @@ namespace usuarios.Services
             _repositorioCodigosActivacion = new RepositorioCodigosActivacion();
         }
 
-        // Solicitud código de activación (Gestor)
         public async Task<string> SolicitarCodigoActivacion(string idUsuario)
         {
             var codigo = new CodigoActivacion(idUsuario, TimeSpan.FromDays(1));
@@ -27,7 +26,6 @@ namespace usuarios.Services
             return codigo.Codigo;
         }
 
-        // Alta de usuario con usuario/contraseña
         public async Task<bool> AltaUsuario(
             string idUsuario,
             string codigoActivacion,
@@ -39,23 +37,20 @@ namespace usuarios.Services
             string contrasena,
             Rol rol)
         {
-            // Validar código de activación
             var codigos = await _repositorioCodigosActivacion.ObtenerTodosAsync();
             var codigoValido = codigos.FirstOrDefault(c => c.Codigo == codigoActivacion && c.UsuarioId == idUsuario && c.EsValido());
 
             if (codigoValido == null)
             {
-                return false; // Código inválido, expirado o no coincide con el ID proporcionado
+                return false; 
             }
 
-            // Verificar si el usuario ya existe
             var usuarioExistente = await _repositorioUsuarios.ObtenerPorIdAsync(idUsuario);
             if (usuarioExistente != null)
             {
                 return false; // Usuario con el mismo ID ya existe
             }
 
-            // Construir el modelo de usuario
             var nuevoUsuario = new Usuario
             {
                 Id = idUsuario, // Asignar el ID proporcionado por el gestor
@@ -69,16 +64,16 @@ namespace usuarios.Services
                 FechaRegistro = DateTime.UtcNow
             };
 
-            // Crear el usuario en la base de datos
+
             await _repositorioUsuarios.InsertarAsync(nuevoUsuario);
 
-            // Eliminar el código de activación para evitar reutilización
+
             await _repositorioCodigosActivacion.EliminarAsync(codigoValido.Id);
 
             return true;
         }
 
-        // Alta de usuario con OAuth2
+
         public async Task<bool> AltaUsuario(
             string idUsuario,
             string codigoActivacion,

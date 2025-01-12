@@ -10,10 +10,11 @@ namespace usuarios.Repositories
 
         protected BaseRepositorio(string nombreColeccion)
         {
-            var cliente = new MongoClient("mongodb://localhost:27017");
-            _database = cliente.GetDatabase("usuarios");
+            var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING") ?? "mongodb://root:example@localhost:27017/usuariosVerificacion?authSource=admin";
 
-            // Crear la colección si no existe
+            var cliente = new MongoClient(connectionString);
+            _database = cliente.GetDatabase("usuariosVerificacion");
+
             if (!ColeccionExiste(nombreColeccion))
             {
                 _database.CreateCollection(nombreColeccion);

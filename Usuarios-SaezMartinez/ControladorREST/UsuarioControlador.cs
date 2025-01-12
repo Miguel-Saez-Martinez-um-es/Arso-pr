@@ -6,7 +6,7 @@ namespace usuarios.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Produces("application/json")] // Todas las respuestas son JSON
+    [Produces("application/json")] 
     public class UsuariosController : ControllerBase
     {
         private readonly ServicioUsuarios _servicioUsuarios;
@@ -16,11 +16,7 @@ namespace usuarios.Controllers
             _servicioUsuarios = new ServicioUsuarios();
         }
 
-        /// <summary>
-        /// Solicitar un código de activación para un usuario.
-        /// </summary>
-        /// <param name="idUsuario">El ID del usuario para el cual se solicita el código de activación.</param>
-        /// <returns>Un código de activación.</returns>
+
         [HttpPost("solicitar-codigo")]
         [ProducesResponseType(200, Type = typeof(CodigoActivacionResponse))]
         public async Task<IActionResult> SolicitarCodigoActivacion([FromQuery] string idUsuario)
@@ -29,13 +25,7 @@ namespace usuarios.Controllers
             return Ok(new CodigoActivacionResponse { Codigo = codigo });
         }
 
-        /// <summary>
-        /// Registrar un nuevo usuario con usuario/contraseña.
-        /// </summary>
-        /// <param name="idUsuario">ID del usuario asignado por el gestor.</param>
-        /// <param name="codigoActivacion">Código de activación generado previamente.</param>
-        /// <param name="request">Datos del usuario.</param>
-        /// <returns>Resultado de la operación.</returns>
+
         [HttpPost("alta-usuario")]
         [ProducesResponseType(200, Type = typeof(ResultadoResponse))]
         [ProducesResponseType(400, Type = typeof(ResultadoResponse))]
@@ -57,20 +47,13 @@ namespace usuarios.Controllers
 
             if (resultado)
             {
-                return Ok(new ResultadoResponse { Mensaje = "Usuario creado exitosamente." });
+                return Ok(new ResultadoResponse { Mensaje = "Usuario creado ." });
             }
 
-            return BadRequest(new ResultadoResponse { Mensaje = "Error al crear el usuario. Verifique el ID y el código de activación." });
+            return BadRequest(new ResultadoResponse { Mensaje = "Error al crear el usuario. Compruebe el ID y el código de activación." });
         }
 
 
-        /// <summary>
-        /// Registrar un nuevo usuario con OAuth2.
-        /// </summary>
-        /// <param name="idUsuario">ID del usuario asignado por el gestor.</param>
-        /// <param name="codigoActivacion">Código de activación generado previamente.</param>
-        /// <param name="request">Datos del usuario.</param>
-        /// <returns>Resultado de la operación.</returns>
         [HttpPost("alta-usuario-oauth2")]
         [ProducesResponseType(200, Type = typeof(ResultadoResponse))]
         [ProducesResponseType(400, Type = typeof(ResultadoResponse))]
@@ -91,18 +74,13 @@ namespace usuarios.Controllers
 
             if (resultado)
             {
-                return Ok(new ResultadoResponse { Mensaje = "Usuario creado exitosamente." });
+                return Ok(new ResultadoResponse { Mensaje = "Usuario creado ." });
             }
 
-            return BadRequest(new ResultadoResponse { Mensaje = "Error al crear el usuario. Verifique el ID y el código de activación." });
+            return BadRequest(new ResultadoResponse { Mensaje = "Error al crear el usuario. Compruebe el ID y el código de activación." });
         }
 
 
-        /// <summary>
-        /// Eliminar un usuario por ID.
-        /// </summary>
-        /// <param name="idUsuario">El ID del usuario.</param>
-        /// <returns>Resultado de la operación.</returns>
         [HttpDelete("baja-usuario/{idUsuario}")]
         [ProducesResponseType(200, Type = typeof(ResultadoResponse))]
         [ProducesResponseType(404, Type = typeof(ResultadoResponse))]
@@ -111,17 +89,12 @@ namespace usuarios.Controllers
             var resultado = await _servicioUsuarios.BajaUsuario(idUsuario);
             if (resultado)
             {
-                return Ok(new ResultadoResponse { Mensaje = "Usuario eliminado exitosamente." });
+                return Ok(new ResultadoResponse { Mensaje = "Usuario eliminado ." });
             }
 
             return NotFound(new ResultadoResponse { Mensaje = "Usuario no encontrado." });
         }
 
-        /// <summary>
-        /// Verificar credenciales de usuario/contraseña.
-        /// </summary>
-        /// <param name="request">Credenciales del usuario.</param>
-        /// <returns>Mapa de claims del usuario.</returns>
         [HttpPost("verificar-credenciales")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<object>))]
         [ProducesResponseType(401, Type = typeof(ResultadoResponse))]
@@ -130,7 +103,6 @@ namespace usuarios.Controllers
             var claims = await _servicioUsuarios.VerificarCredenciales(request.NombreUsuario, request.Contrasena);
             if (claims != null)
             {
-                // Convertir claims a un formato legible como JSON
                 var response = claims.Select(c => new { c.Type, c.Value });
                 return Ok(response);
             }
@@ -139,11 +111,6 @@ namespace usuarios.Controllers
         }
 
 
-        /// <summary>
-        /// Verificar usuario mediante OAuth2.
-        /// </summary>
-        /// <param name="request">Identificador OAuth2 del usuario.</param>
-        /// <returns>Mapa de claims del usuario.</returns>
         [HttpPost("verificar-usuario-oauth2")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<object>))]
         [ProducesResponseType(404, Type = typeof(ResultadoResponse))]
@@ -152,7 +119,6 @@ namespace usuarios.Controllers
             var claims = await _servicioUsuarios.VerificarUsuarioOAuth2(request.IdentificadorOAuth2);
             if (claims != null)
             {
-                // Convertir claims a un formato legible como JSON
                 var response = claims.Select(c => new { c.Type, c.Value });
                 return Ok(response);
             }
@@ -160,11 +126,6 @@ namespace usuarios.Controllers
             return NotFound(new ResultadoResponse { Mensaje = "Usuario no encontrado." });
         }
 
-
-        /// <summary>
-        /// Listar todos los usuarios registrados.
-        /// </summary>
-        /// <returns>Lista de usuarios.</returns>
         [HttpGet("listar-usuarios")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Usuario>))]
         public async Task<IActionResult> ListarUsuarios()
@@ -174,7 +135,6 @@ namespace usuarios.Controllers
         }
     }
 
-    // Clases auxiliares para las respuestas
     public class ResultadoResponse
     {
         public string Mensaje { get; set; }
