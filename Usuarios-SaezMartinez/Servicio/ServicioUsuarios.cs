@@ -48,18 +48,18 @@ namespace usuarios.Services
             var usuarioExistente = await _repositorioUsuarios.ObtenerPorIdAsync(idUsuario);
             if (usuarioExistente != null)
             {
-                return false; // Usuario con el mismo ID ya existe
+                return false; 
             }
 
             var nuevoUsuario = new Usuario
             {
-                Id = idUsuario, // Asignar el ID proporcionado por el gestor
+                Id = idUsuario, 
                 NombreCompleto = nombreCompleto,
                 CorreoElectronico = correoElectronico,
                 Telefono = telefono,
                 DireccionPostal = direccionPostal,
                 Nombre = nombreUsuario,
-                Contrasena = contrasena, // Encriptar la contraseña antes de guardarla
+                Contrasena = contrasena, 
                 Rol = rol,
                 FechaRegistro = DateTime.UtcNow
             };
@@ -93,14 +93,14 @@ namespace usuarios.Services
                 return false; // Código inválido, expirado o no coincide con el ID proporcionado
             }
 
-            // Verificar si el usuario ya existe
+
             var usuarioExistente = await _repositorioUsuarios.ObtenerPorIdAsync(idUsuario);
             if (usuarioExistente != null)
             {
                 return false; // Usuario con el mismo ID ya existe
             }
 
-            // Construir el modelo de usuario
+
             var nuevoUsuario = new Usuario
             {
                 Id = idUsuario, // Asignar el ID proporcionado por el gestor
@@ -113,30 +113,30 @@ namespace usuarios.Services
                 FechaRegistro = DateTime.UtcNow
             };
 
-            // Crear el usuario en la base de datos
+
             await _repositorioUsuarios.InsertarAsync(nuevoUsuario);
 
-            // Eliminar el código de activación para evitar reutilización
+
             await _repositorioCodigosActivacion.EliminarAsync(codigoValido.Id);
 
             return true;
         }
 
 
-        // Baja de usuario (Gestor)
+
         public async Task<bool> BajaUsuario(string idUsuario)
         {
             var usuario = await _repositorioUsuarios.ObtenerPorIdAsync(idUsuario);
             if (usuario == null)
             {
-                return false; // Usuario no encontrado
+                return false; 
             }
 
             await _repositorioUsuarios.EliminarAsync(idUsuario);
             return true;
         }
 
-        // Verificar credenciales (Usuario)
+
         public async Task<List<Claim>> VerificarCredenciales(string nombreUsuario, string contrasena)
         {
             var usuarios = await _repositorioUsuarios.ObtenerTodosAsync();

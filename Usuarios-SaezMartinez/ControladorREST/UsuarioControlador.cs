@@ -17,7 +17,7 @@ namespace usuarios.Controllers
         }
 
 
-        [HttpPost("solicitar-codigo")]
+        [HttpPost("solicitarCodigo")]
         [ProducesResponseType(200, Type = typeof(CodigoActivacionResponse))]
         public async Task<IActionResult> SolicitarCodigoActivacion([FromQuery] string idUsuario)
         {
@@ -26,7 +26,7 @@ namespace usuarios.Controllers
         }
 
 
-        [HttpPost("alta-usuario")]
+        [HttpPost("altaUsuario")]
         [ProducesResponseType(200, Type = typeof(ResultadoResponse))]
         [ProducesResponseType(400, Type = typeof(ResultadoResponse))]
         public async Task<IActionResult> AltaUsuarioConContraseña(
@@ -54,7 +54,7 @@ namespace usuarios.Controllers
         }
 
 
-        [HttpPost("alta-usuario-oauth2")]
+        [HttpPost("altaUsuario-oauth2")]
         [ProducesResponseType(200, Type = typeof(ResultadoResponse))]
         [ProducesResponseType(400, Type = typeof(ResultadoResponse))]
         public async Task<IActionResult> AltaUsuarioConOAuth2(
@@ -81,7 +81,7 @@ namespace usuarios.Controllers
         }
 
 
-        [HttpDelete("baja-usuario/{idUsuario}")]
+        [HttpDelete("bajaUsuario/{idUsuario}")]
         [ProducesResponseType(200, Type = typeof(ResultadoResponse))]
         [ProducesResponseType(404, Type = typeof(ResultadoResponse))]
         public async Task<IActionResult> BajaUsuario(string idUsuario)
@@ -95,7 +95,7 @@ namespace usuarios.Controllers
             return NotFound(new ResultadoResponse { Mensaje = "Usuario no encontrado." });
         }
 
-        [HttpPost("verificar-credenciales")]
+        [HttpPost("verificarCredenciales")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<object>))]
         [ProducesResponseType(401, Type = typeof(ResultadoResponse))]
         public async Task<IActionResult> VerificarCredenciales([FromBody] CredencialesRequest request)
@@ -111,7 +111,7 @@ namespace usuarios.Controllers
         }
 
 
-        [HttpPost("verificar-usuario-oauth2")]
+        [HttpPost("verificarUsuarioOauth2")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<object>))]
         [ProducesResponseType(404, Type = typeof(ResultadoResponse))]
         public async Task<IActionResult> VerificarUsuarioOAuth2([FromBody] OAuth2Request request)
@@ -126,7 +126,7 @@ namespace usuarios.Controllers
             return NotFound(new ResultadoResponse { Mensaje = "Usuario no encontrado." });
         }
 
-        [HttpGet("listar-usuarios")]
+        [HttpGet("listarUsuarios")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Usuario>))]
         public async Task<IActionResult> ListarUsuarios()
         {
